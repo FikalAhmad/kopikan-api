@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  CASHIER
+  INVENTORY_MANAGER
+  CUSTOMER
+}
+
+enum Permission {
+  // User Management
+  MANAGE_USERS
+  VIEW_USERS
+  
+  // Product Management
+  MANAGE_PRODUCTS
+  VIEW_PRODUCTS
+  
+  // Order Management
+  MANAGE_ORDERS
+  VIEW_ORDERS
+  CREATE_ORDER
+  CANCEL_ORDER
+  
+  // Settings
+  MANAGE_SETTINGS
+}
+
+model User {
+  id                String            @id @default(cuid())
+  name              String          
+  email             String            @unique
+  password          String          
+  refresh_token     String?           @db.Text @unique
+  role              UserRole          @default(CUSTOMER)
+  permissions       Permission[]      @default([])
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+
+  @@map("users")
+}
+  // role_id           String
+  // created_at        DateTime          @default(now())
+  // updated_at        DateTime          @updatedAt
+
+  // role              Role              @relation(fields: [role_id], references: [id])
+
+// model Role {
+//   id                String            @id @default(cuid())
+//   name              String            @unique
+//   created_at        DateTime          @default(now())
+//   updated_at        DateTime          @updatedAt
+  
+//   users             User[]
+//   permissions       RolePermission[]
+
+//   @@map("roles")
+// }
+
+
+// model Permission {
+//   id              String              @id @default(cuid())
+//   name            String              @unique
+//   created_at      DateTime            @default(now())
+//   updated_at      DateTime            @updatedAt
+
+//   roles           RolePermission[]
+
+//   @@map("permissions")
+// }
+
+// model RolePermission {
+//   role_id         String
+//   permission_id   String
+//   created_at      DateTime            @default(now())
+
+//   role            Role                @relation(fields: [role_id], references: [id])
+//   permission      Permission          @relation(fields: [permission_id], references: [id])
+
+//   @@id([role_id, permission_id])
+//   @@map("role_permissions")
+// }
