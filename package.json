@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "dist/main.js",
   "scripts": {
-    "build": "prisma generate && tsc",
+    "build": "prisma generate && prisma migrate deploy && tsc",
+    "postinstall": "prisma generate",
     "start": "node dist/main.js",
     "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
