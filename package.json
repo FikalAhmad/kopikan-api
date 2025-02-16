@@ -1,9 +1,10 @@
 {
   "name": "user-pos",
   "version": "1.0.0",
-  "main": "main.ts",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "nodemon src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
     "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:generate": "prisma migrate dev",
