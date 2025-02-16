@@ -106,7 +106,7 @@ export const Login = async (req: Request, res: Response) => {
       msg,
     });
   } catch (error) {
-    res.status(404).json({ msg: "Email tidak ditemukan" });
+    res.status(404).json({ msg: "Email not found" });
   }
 };
 

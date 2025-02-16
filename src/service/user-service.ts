@@ -25,7 +25,7 @@ export const register = async (
   });
 
   if (totalUserWithSameUsername !== 0) {
-    throw new ResponseError(400, "Username already exists!");
+    throw new ResponseError(400, "Username already exists");
   }
 
   registerRequest.password = await bcrypt.hash(registerRequest.password, 10);
@@ -35,7 +35,7 @@ export const register = async (
   });
 
   return {
-    msg: "Register Berhasil",
+    msg: "Register succesfully",
   };
 };
 
@@ -51,7 +51,7 @@ export const login = async (
   });
 
   if (!user) {
-    throw new ResponseError(401, "Username or password is wrong!");
+    throw new ResponseError(401, "Username or password is wrong");
   }
 
   const isPasswordValid = await bcrypt.compare(
@@ -59,7 +59,7 @@ export const login = async (
     user.password
   );
   if (!isPasswordValid) {
-    throw new ResponseError(401, "Username or password is wrong!");
+    throw new ResponseError(401, "Username or password is wrong");
   }
 
   const id = user.id;
@@ -90,7 +90,7 @@ export const login = async (
   return {
     refreshToken: refreshToken,
     accessToken: accessToken,
-    msg: "Login successfully",
+    msg: "Login successfully!",
   };
 };
 
