@@ -1,11 +1,12 @@
 {
   "name": "user-pos",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "nodemon dist/main.js",
+    "build": "prisma generate && prisma migrate deploy && tsc",
+    "start": "node dist/main.js",
+    "vercel-build": "prisma generate && prisma migrate deploy && tsc",
     "dev": "nodemon",
-    "build": "prisma generate && nodemon dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:generate": "prisma migrate dev",
     "db:migrate": "prisma migrate deploy",
