@@ -5,6 +5,7 @@
   "scripts": {
     "start": "nodemon dist/main.js",
     "dev": "nodemon",
+    "build": "nodemon dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:generate": "prisma migrate dev",
     "db:migrate": "prisma migrate deploy",
