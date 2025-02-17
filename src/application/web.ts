@@ -8,20 +8,15 @@ import { apiRouter } from "../routes/api";
 dotenv.config();
 export const web = express();
 web.use(express.json());
+web.use(cookieParser());
 web.use(
   cors({
-    origin: function (origin, callback) {
-      callback(null, true);
-    },
-    // origin: [
-    //   "http://localhost:3000",
-    //   "http://your-production-domain.com",
-    //   "https://your-production-domain.com"
-    // ],
+    origin: ["http://localhost:3000", "https://pos-kopikan.vercel.app"],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-web.use(cookieParser());
 
 web.use(publicRouter);
 web.use(apiRouter);

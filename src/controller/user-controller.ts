@@ -94,32 +94,30 @@ export const Login = async (req: Request, res: Response) => {
     const response = await login(request);
     const { accessToken, refreshToken, msg } = response;
 
-    if (!refreshToken) {
-      return res.status(400).json({
-        msg: "Refresh token not generated",
-      });
-    }
-
-    // Deteksi environment
-    const isDevelopment = process.env.NODE_ENV === "development";
-
+    // Set cookie dulu
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      secure: !isDevelopment, // true di production, false di development
+      maxAge: 24 * 60 * 60 * 1000, // 24 jam
+      sameSite: "none",
+      secure: true,
       path: "/",
-      sameSite: isDevelopment ? "lax" : "none",
-      domain: isDevelopment ? "localhost" : ".vercel.app",
     });
 
+    // Kemudian kirim response JSON
     return res.status(200).json({
       accessToken,
+      refreshToken,
       msg,
     });
   } catch (error) {
-    console.error("Login error:", error);
-    return res.status(400).json({
-      msg: error instanceof Error ? error.message : "Login failed",
+    // Error handling yang lebih baik
+    if (error instanceof Error) {
+      return res.status(400).json({
+        msg: error.message || "Login failed",
+      });
+    }
+    return res.status(500).json({
+      msg: "Internal server error",
     });
   }
 };
