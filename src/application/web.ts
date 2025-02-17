@@ -8,7 +8,19 @@ import { apiRouter } from "../routes/api";
 dotenv.config();
 export const web = express();
 web.use(express.json());
-web.use(cors());
+web.use(
+  cors({
+    origin: function (origin, callback) {
+      callback(null, true);
+    },
+    // origin: [
+    //   "http://localhost:3000",
+    //   "http://your-production-domain.com",
+    //   "https://your-production-domain.com"
+    // ],
+    credentials: true,
+  })
+);
 web.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "*");
