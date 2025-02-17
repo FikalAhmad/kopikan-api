@@ -129,6 +129,7 @@ export const Logout = async (
 
     res.clearCookie("refreshToken", {
       httpOnly: true,
+      sameSite: "none",
     });
     return res.status(200).json(response);
   } catch (error) {
