@@ -8,7 +8,14 @@ import { apiRouter } from "../routes/api";
 dotenv.config();
 export const web = express();
 web.use(express.json());
-web.use(cors({ credentials: true }));
+web.use(
+  cors({
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
+    credentials: true,
+  })
+);
 web.use(cookieParser());
 
 web.use(publicRouter);
