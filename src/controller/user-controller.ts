@@ -101,7 +101,7 @@ export const Login = async (req: Request, res: Response) => {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
         sameSite: "none",
-        secure: false,
+        secure: true,
         path: "/",
       })
       .json({
