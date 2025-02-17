@@ -93,14 +93,6 @@ export const Login = async (req: Request, res: Response) => {
     const request: LoginUserRequest = req.body as LoginUserRequest;
     const response = await login(request);
     const { accessToken, refreshToken, msg } = response;
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "none",
-      secure: true,
-      domain:
-        process.env.NODE_ENV === "production" ? ".vercel.app" : "localhost",
-    });
     // res.cookie("refreshToken", refreshToken, {
     //   httpOnly: true,
     //   secure: process.env.NODE_ENV === "production",
@@ -108,6 +100,12 @@ export const Login = async (req: Request, res: Response) => {
     res.status(200).json({
       accessToken,
       msg,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "none",
+      secure: true,
     });
   } catch (error) {
     res.status(404).json({ msg: "Email not found" });
