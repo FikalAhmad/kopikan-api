@@ -10,9 +10,7 @@ export const web = express();
 web.use(express.json());
 web.use(
   cors({
-    origin: (origin, callback) => {
-      callback(null, true);
-    },
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
