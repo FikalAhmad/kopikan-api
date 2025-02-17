@@ -99,18 +99,16 @@ export const Login = async (req: Request, res: Response) => {
       .status(200)
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 24 jam
+        maxAge: 24 * 60 * 60 * 1000,
         sameSite: "none",
-        secure: true,
+        secure: false,
         path: "/",
-        domain: ".vercel.app",
       })
       .json({
         accessToken,
         msg,
       });
   } catch (error) {
-    // Error handling yang lebih baik
     if (error instanceof Error) {
       return res.status(400).json({
         msg: error.message || "Login failed",
