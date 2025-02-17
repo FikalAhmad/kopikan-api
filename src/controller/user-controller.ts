@@ -103,7 +103,7 @@ export const Login = async (req: Request, res: Response) => {
       msg,
     });
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
+      httpOnly: false,
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: "none",
       secure: true,
