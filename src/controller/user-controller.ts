@@ -98,6 +98,8 @@ export const Login = async (req: Request, res: Response) => {
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: "none",
       secure: true,
+      domain:
+        process.env.NODE_ENV === "production" ? ".vercel.app" : "localhost",
     });
     // res.cookie("refreshToken", refreshToken, {
     //   httpOnly: true,
