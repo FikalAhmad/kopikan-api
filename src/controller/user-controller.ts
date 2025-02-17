@@ -103,7 +103,7 @@ export const Login = async (req: Request, res: Response) => {
       msg,
     });
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: false,
+      httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: "none",
       secure: true,
@@ -121,14 +121,6 @@ export const Logout = async (
 ) => {
   try {
     const refreshToken = req.cookies.refreshToken;
-
-    if (!refreshToken) {
-      res.clearCookie("refreshToken", {
-        httpOnly: true,
-      });
-      return res.status(200).json({ msg: "Already logged out" });
-    }
-
     const response = await logout(refreshToken);
 
     res.clearCookie("refreshToken", {
