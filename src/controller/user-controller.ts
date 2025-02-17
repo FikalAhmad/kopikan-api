@@ -99,6 +99,7 @@ export const Login = async (req: Request, res: Response) => {
     // });
     res.status(200).json({
       accessToken,
+      refreshToken,
       msg,
     });
     res.cookie("refreshToken", refreshToken, {
@@ -106,6 +107,7 @@ export const Login = async (req: Request, res: Response) => {
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: "none",
       secure: true,
+      path: "/",
     });
   } catch (error) {
     res.status(404).json({ msg: "Email not found" });
