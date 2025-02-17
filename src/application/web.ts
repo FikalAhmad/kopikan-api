@@ -10,7 +10,14 @@ export const web = express();
 web.use(express.json());
 web.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: function (origin, callback) {
+      callback(null, true);
+    },
+    // origin: [
+    //   "http://localhost:3000",
+    //   "http://your-production-domain.com",
+    //   "https://your-production-domain.com"
+    // ],
     credentials: true,
   })
 );

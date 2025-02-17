@@ -99,7 +99,6 @@ export const Login = async (req: Request, res: Response) => {
       sameSite: "none",
       path: "/",
       secure: true,
-      partitioned: true,
     });
     // res.cookie("refreshToken", refreshToken, {
     //   httpOnly: true,
