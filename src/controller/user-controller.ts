@@ -95,20 +95,19 @@ export const Login = async (req: Request, res: Response) => {
     const { accessToken, refreshToken, msg } = response;
 
     // Set cookie dulu
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 jam
-      sameSite: "none",
-      secure: true,
-      path: "/",
-    });
-
-    // Kemudian kirim response JSON
-    return res.status(200).json({
-      accessToken,
-      refreshToken,
-      msg,
-    });
+    res
+      .status(200)
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 jam
+        sameSite: "none",
+        secure: true,
+        path: "/",
+      })
+      .json({
+        accessToken,
+        msg,
+      });
   } catch (error) {
     // Error handling yang lebih baik
     if (error instanceof Error) {
