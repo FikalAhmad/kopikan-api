@@ -103,6 +103,7 @@ export const Login = async (req: Request, res: Response) => {
         sameSite: "none",
         secure: true,
         path: "/",
+        domain: ".vercel.app",
       })
       .json({
         accessToken,
