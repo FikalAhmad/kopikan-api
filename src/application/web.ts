@@ -19,6 +19,8 @@ web.use(
     //   "https://your-production-domain.com"
     // ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 web.use(cookieParser());
