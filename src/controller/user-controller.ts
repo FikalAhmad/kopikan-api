@@ -93,24 +93,32 @@ export const Login = async (req: Request, res: Response) => {
     const request: LoginUserRequest = req.body as LoginUserRequest;
     const response = await login(request);
     const { accessToken, refreshToken, msg } = response;
-    // res.cookie("refreshToken", refreshToken, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    // });
-    res.status(200).json({
-      accessToken,
-      refreshToken,
-      msg,
-    });
+
+    // Set cookie dulu
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 24 jam
       sameSite: "none",
       secure: true,
       path: "/",
     });
+
+    // Kemudian kirim response JSON
+    return res.status(200).json({
+      accessToken,
+      refreshToken,
+      msg,
+    });
   } catch (error) {
-    res.status(404).json({ msg: "Email not found" });
+    // Error handling yang lebih baik
+    if (error instanceof Error) {
+      return res.status(400).json({
+        msg: error.message || "Login failed",
+      });
+    }
+    return res.status(500).json({
+      msg: "Internal server error",
+    });
   }
 };
 
