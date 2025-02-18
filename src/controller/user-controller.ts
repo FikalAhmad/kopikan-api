@@ -100,11 +100,10 @@ export const Login = async (req: Request, res: Response) => {
         maxAge: 24 * 60 * 60 * 1000,
         sameSite: "none",
         secure: true,
-        path: "/",
-        domain: "pos-kopikan.vercel.app",
       })
       .json({
         accessToken,
+        refreshToken,
         msg,
       });
   } catch (error) {
