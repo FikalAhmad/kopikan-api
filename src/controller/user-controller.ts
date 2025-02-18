@@ -101,6 +101,7 @@ export const Login = async (req: Request, res: Response) => {
         sameSite: "none",
         secure: true,
       })
+      .setHeader("Authorization", `Bearer ${accessToken}`)
       .json({
         accessToken,
         refreshToken,
