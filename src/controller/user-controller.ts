@@ -93,9 +93,6 @@ export const Login = async (req: Request, res: Response) => {
     const request: LoginUserRequest = req.body as LoginUserRequest;
     const response = await login(request);
     const { accessToken, refreshToken, msg } = response;
-
-    const origin = req.get("origin");
-    const isProduction = origin?.includes("vercel.app");
     res
       .status(200)
       .cookie("refreshToken", refreshToken, {
@@ -104,7 +101,6 @@ export const Login = async (req: Request, res: Response) => {
         sameSite: "none",
         secure: true,
         path: "/",
-        ...(isProduction && { domain: ".vercel.app" }),
       })
       .json({
         accessToken,

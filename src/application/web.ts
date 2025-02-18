@@ -11,9 +11,9 @@ web.use(express.json());
 web.use(cookieParser());
 web.use(
   cors({
-    origin: ["http://localhost:3000", "https://pos-kopikan.vercel.app"],
+    origin: true,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
