@@ -104,7 +104,7 @@ export const Login = async (req: Request, res: Response) => {
         sameSite: "none",
         secure: true,
         path: "/",
-        ...(isProduction && { domain: "vercel.app" }),
+        ...(isProduction && { domain: ".vercel.app" }),
       })
       .json({
         accessToken,
