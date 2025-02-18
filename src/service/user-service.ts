@@ -72,6 +72,7 @@ export const login = async (
       expiresIn: "10m",
     }
   );
+  console.log("Generating refresh token");
   const refreshToken = jwt.sign(
     { id, name, email },
     process.env.REFRESH_TOKEN_SECRET ?? "",
@@ -79,6 +80,7 @@ export const login = async (
       expiresIn: "1d",
     }
   );
+  console.log("Generated token:", refreshToken);
   await prismaClient.user.update({
     where: {
       email: loginRequest.email,

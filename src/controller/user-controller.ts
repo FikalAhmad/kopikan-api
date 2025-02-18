@@ -92,9 +92,10 @@ export const Login = async (req: Request, res: Response) => {
   try {
     const request: LoginUserRequest = req.body as LoginUserRequest;
     const response = await login(request);
+    console.log("Login response:", response);
     const { accessToken, refreshToken, msg } = response;
 
-    // Set cookie dulu
+    console.log("Setting cookie with token:", refreshToken);
     res
       .status(200)
       .cookie("refreshToken", refreshToken, {
@@ -108,6 +109,7 @@ export const Login = async (req: Request, res: Response) => {
         accessToken,
         msg,
       });
+    console.log("Cookie set complete");
   } catch (error) {
     if (error instanceof Error) {
       return res.status(400).json({
