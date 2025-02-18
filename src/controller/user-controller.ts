@@ -95,12 +95,12 @@ export const Login = async (req: Request, res: Response) => {
     const { accessToken, refreshToken, msg } = response;
     res
       .status(200)
-      .cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: "none",
-        secure: true,
-      })
+      // .cookie("refreshToken", refreshToken, {
+      //   httpOnly: true,
+      //   maxAge: 24 * 60 * 60 * 1000,
+      //   sameSite: "none",
+      //   secure: true,
+      // })
       .setHeader(
         "Set-Cookie",
         `refreshToken=${refreshToken}; HttpOnly; Max-Age=86400; Path=/; Secure; SameSite=None`
