@@ -101,7 +101,10 @@ export const Login = async (req: Request, res: Response) => {
         sameSite: "none",
         secure: true,
       })
-      .setHeader("Authorization", `Bearer ${accessToken}`)
+      .setHeader(
+        "Set-Cookie",
+        `refreshToken=${refreshToken}; HttpOnly; Max-Age=86400; Path=/; Secure; SameSite=None`
+      )
       .json({
         accessToken,
         refreshToken,
