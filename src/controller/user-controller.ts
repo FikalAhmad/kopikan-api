@@ -101,7 +101,7 @@ export const Login = async (req: Request, res: Response) => {
         sameSite: "none",
         secure: true,
         path: "/",
-        domain: "https://pos-kopikan.vercel.app",
+        domain: "pos-kopikan.vercel.app",
       })
       .json({
         accessToken,
