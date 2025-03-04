@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { UserRequest } from "../types/user-request.js";
 import { NextFunction, Request, Response } from "express";
 import {
+  deleteById,
   get,
   getById,
   login,
@@ -35,12 +36,6 @@ export const getUsersById = async (
 ) => {
   try {
     if (!req.params.id) {
-      return res.status(401).json({
-        error: "User not authenticated",
-      });
-    }
-
-    if (!req.params.id) {
       return res.status(400).json({
         error: "User ID not found",
       });
@@ -67,8 +62,33 @@ export const updateUser = async (
 ) => {
   try {
     const request: UpdateUserRequest = req.body as UpdateUserRequest;
-    const response = await update(req.user!, request);
+    const response = await update(req.params.id, request);
     res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser = async (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.params.id) {
+      return res.status(400).json({
+        error: "User ID not found",
+      });
+    }
+
+    const response = await deleteById(req.params.id);
+    if (!response) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    return res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -95,16 +115,12 @@ export const Login = async (req: Request, res: Response) => {
     const { accessToken, refreshToken, msg } = response;
     res
       .status(200)
-      // .cookie("refreshToken", refreshToken, {
-      //   httpOnly: true,
-      //   maxAge: 24 * 60 * 60 * 1000,
-      //   sameSite: "none",
-      //   secure: true,
-      // })
-      .setHeader(
-        "Set-Cookie",
-        `refreshToken=${refreshToken}; HttpOnly; Max-Age=86400; Path=/; Secure; SameSite=None`
-      )
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: "none",
+        // secure: true,
+      })
       .json({
         accessToken,
         refreshToken,
@@ -134,7 +150,7 @@ export const Logout = async (
     res.clearCookie("refreshToken", {
       httpOnly: true,
       sameSite: "none",
-      secure: true,
+      // secure: true,
     });
     return res.status(200).json(response);
   } catch (error) {

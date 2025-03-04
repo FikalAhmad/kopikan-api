@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  deleteUser,
   getUsers,
   getUsersById,
   Logout,
@@ -13,5 +14,6 @@ export const apiRouter = express.Router();
 // User API
 apiRouter.get("/api/users", authMiddleware, getUsers);
 apiRouter.get("/api/users/:id", authMiddleware, getUsersById);
-apiRouter.patch("/api/users", authMiddleware, updateUser);
+apiRouter.patch("/api/users/:id", authMiddleware, updateUser);
+apiRouter.delete("/api/users/:id", authMiddleware, deleteUser);
 apiRouter.patch("/api/logout", authMiddleware, Logout);

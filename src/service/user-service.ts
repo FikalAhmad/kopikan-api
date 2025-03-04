@@ -120,27 +120,34 @@ export const getById = async (id: string): Promise<UserResponse> => {
 };
 
 export const update = async (
-  user: User,
+  id: string,
   request: UpdateUserRequest
 ): Promise<MessageResponse> => {
   const updateRequest = validate(UserValidaton.UPDATE, request);
 
-  if (updateRequest.name) {
-    user.name = updateRequest.name;
-  }
-
   if (updateRequest.password) {
-    user.password = await bcrypt.hash(updateRequest.password, 10);
+    updateRequest.password = await bcrypt.hash(updateRequest.password, 10);
   }
 
   await prismaClient.user.update({
     where: {
-      email: user.email,
+      id,
     },
-    data: user,
+    data: updateRequest,
   });
 
   return { msg: "Updated successfully" };
+};
+
+export const deleteById = async (id: string): Promise<MessageResponse> => {
+  const deleteUserById = await prismaClient.user.delete({
+    where: { id },
+  });
+
+  if (!deleteUserById) {
+    throw new ResponseError(404, "User ID is not found");
+  }
+  return { msg: "Deleted successfully" };
 };
 
 export const logout = async (
