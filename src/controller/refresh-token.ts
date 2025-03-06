@@ -4,7 +4,6 @@ import { Request, Response } from "express";
 
 export const refreshToken = async (req: Request, res: Response) => {
   try {
-    console.log("Cookies:", req.cookies);
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) return res.sendStatus(401);
     const user = await prismaClient.user.findFirst({
