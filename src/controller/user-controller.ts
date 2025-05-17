@@ -1,9 +1,7 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { UserRequest } from "../types/user-request.js";
 import { NextFunction, Request, Response } from "express";
 import {
-  deleteById,
+  remove,
   get,
   getById,
   login,
@@ -29,7 +27,8 @@ export const getUsers = async (
     next(error);
   }
 };
-export const getUsersById = async (
+
+export const getUserById = async (
   req: UserRequest,
   res: Response,
   next: NextFunction
@@ -81,7 +80,7 @@ export const deleteUser = async (
       });
     }
 
-    const response = await deleteById(req.params.id);
+    const response = await remove(req.params.id);
     if (!response) {
       return res.status(404).json({
         error: "User not found",

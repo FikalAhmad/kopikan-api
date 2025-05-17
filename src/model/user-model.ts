@@ -1,20 +1,19 @@
-import { User } from "@prisma/client";
-
 export type UserResponse = {
   id: string;
   name: string;
   email: string;
+  phone: string;
   refresh_token?: string;
-};
-
-export type MessageResponse = {
-  msg: string;
+  role_id: string;
 };
 
 export type CreateUserRequest = {
   name: string;
-  email: string;
   password: string;
+  email: string;
+  phone: string;
+  refresh_token?: string;
+  role_id: string;
 };
 
 export type LoginUserRequest = {
@@ -25,4 +24,5 @@ export type LoginUserRequest = {
 export type UpdateUserRequest = {
   name?: string;
   password?: string;
+  phone?: string;
 };

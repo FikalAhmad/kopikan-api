@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import {
   CreateUserRequest,
   LoginUserRequest,
-  MessageResponse,
   UpdateUserRequest,
   UserResponse,
 } from "../model/user-model";
@@ -11,7 +10,7 @@ import { prismaClient } from "../application/database";
 import { validate } from "../validation/validation";
 import { UserValidaton } from "../validation/user-validation";
 import { ResponseError } from "../error/response-error";
-import { User } from "@prisma/client";
+import { MessageResponse } from "../types/globals.types";
 
 export const register = async (
   request: CreateUserRequest
@@ -51,7 +50,7 @@ export const login = async (
   });
 
   if (!user) {
-    throw new ResponseError(401, "Username or password is wrong");
+    throw new ResponseError(401, "Email or password is wrong");
   }
 
   const isPasswordValid = await bcrypt.compare(
@@ -59,7 +58,7 @@ export const login = async (
     user.password
   );
   if (!isPasswordValid) {
-    throw new ResponseError(401, "Username or password is wrong");
+    throw new ResponseError(401, "Email or password is wrong");
   }
 
   const id = user.id;
@@ -69,7 +68,7 @@ export const login = async (
     { id, name, email },
     process.env.ACCESS_TOKEN_SECRET ?? "",
     {
-      expiresIn: "1m",
+      expiresIn: "1d",
     }
   );
   const refreshToken = jwt.sign(
@@ -100,10 +99,13 @@ export const get = async (): Promise<UserResponse[]> => {
       id: true,
       name: true,
       email: true,
+      phone: true,
+      role_id: true,
     },
   });
   return user;
 };
+
 export const getById = async (id: string): Promise<UserResponse> => {
   const userById = await prismaClient.user.findUnique({
     where: { id },
@@ -111,6 +113,8 @@ export const getById = async (id: string): Promise<UserResponse> => {
       id: true,
       name: true,
       email: true,
+      phone: true,
+      role_id: true,
     },
   });
   if (!userById) {
@@ -139,7 +143,7 @@ export const update = async (
   return { msg: "Updated successfully" };
 };
 
-export const deleteById = async (id: string): Promise<MessageResponse> => {
+export const remove = async (id: string): Promise<MessageResponse> => {
   const deleteUserById = await prismaClient.user.delete({
     where: { id },
   });

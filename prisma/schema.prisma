@@ -1,96 +1,77 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  SUPER_ADMIN
-  ADMIN
-  CASHIER
-  INVENTORY_MANAGER
-  CUSTOMER
-}
-
-enum Permission {
-  // User Management
-  MANAGE_USERS
-  VIEW_USERS
-  
-  // Product Management
-  MANAGE_PRODUCTS
-  VIEW_PRODUCTS
-  
-  // Order Management
-  MANAGE_ORDERS
-  VIEW_ORDERS
-  CREATE_ORDER
-  CANCEL_ORDER
-  
-  // Settings
-  MANAGE_SETTINGS
-}
-
 model User {
-  id                String            @id @default(cuid())
-  name              String          
-  email             String            @unique
-  password          String          
-  refresh_token     String?           @db.Text @unique
-  role              UserRole          @default(CUSTOMER)
-  permissions       Permission[]      @default([])
-  created_at        DateTime          @default(now())
-  updated_at        DateTime          @updatedAt
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  password      String
+  email         String  @unique
+  phone         String  @unique
+  role_id       String  @db.ObjectId
+  refresh_token String?
 
-  @@map("users")
+  role   Role    @relation(fields: [role_id], references: [id])
+  orders Order[]
 }
-  // role_id           String
-  // created_at        DateTime          @default(now())
-  // updated_at        DateTime          @updatedAt
 
-  // role              Role              @relation(fields: [role_id], references: [id])
+model Role {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  role_name String
+  users     User[]
+}
 
-// model Role {
-//   id                String            @id @default(cuid())
-//   name              String            @unique
-//   created_at        DateTime          @default(now())
-//   updated_at        DateTime          @updatedAt
-  
-//   users             User[]
-//   permissions       RolePermission[]
+model Order {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  customer_id      String        @db.ObjectId
+  order_date       DateTime      @default(now())
+  order_type       String // offline (dine-in & takeaway), online (delivery)
+  order_source     String // offline, online
+  delivery_address String? // null jika offline
+  total            Int
+  status           String        @default("pending") // pending, completed, canceled
+  order_details    OrderDetail[]
+  payment          Payment?
 
-//   @@map("roles")
-// }
+  customer User @relation(fields: [customer_id], references: [id])
+}
 
+model OrderDetail {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  order_id    String @unique @db.ObjectId
+  product_id  String @db.ObjectId
+  qty         Int
+  unit_price  Int
+  total_price Int
 
-// model Permission {
-//   id              String              @id @default(cuid())
-//   name            String              @unique
-//   created_at      DateTime            @default(now())
-//   updated_at      DateTime            @updatedAt
+  order   Order   @relation(fields: [order_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+}
 
-//   roles           RolePermission[]
+model Product {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  product_name  String
+  image         String
+  category      String
+  description   String
+  price         Int
+  stock         Int
+  order_details OrderDetail[]
+}
 
-//   @@map("permissions")
-// }
+model Payment {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  order_id       String   @unique @db.ObjectId
+  payment_date   DateTime @default(now())
+  amount         Int
+  status         String // paid, pending, failed
+  payment_method String // cash, card, e-wallet
+  transaction_id String? // null jika pembayaran offline tapi dua"nya aja gak sih?
 
-// model RolePermission {
-//   role_id         String
-//   permission_id   String
-//   created_at      DateTime            @default(now())
-
-//   role            Role                @relation(fields: [role_id], references: [id])
-//   permission      Permission          @relation(fields: [permission_id], references: [id])
-
-//   @@id([role_id, permission_id])
-//   @@map("role_permissions")
-// }
+  order Order @relation(fields: [order_id], references: [id])
+}

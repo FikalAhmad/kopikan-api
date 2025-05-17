@@ -2,18 +2,59 @@ import express from "express";
 import {
   deleteUser,
   getUsers,
-  getUsersById,
+  getUserById,
   Logout,
   updateUser,
 } from "../controller/user-controller";
 import { authMiddleware } from "../middleware/auth-middleware";
+import {
+  deleteRole,
+  getRoles,
+  updateRole,
+} from "../controller/role-controller";
+import {
+  createProduct,
+  deleteProduct,
+  getProducts,
+  updateProduct,
+} from "../controller/product-controller";
+import {
+  createOrder,
+  deleteOrder,
+  getOfflineOrders,
+  getOnlineOrders,
+  getOrderById,
+  getOrders,
+  updateOrder,
+} from "../controller/order-controller";
 
 export const apiRouter = express.Router();
-// apiRouter.use(authMiddleware);
+apiRouter.use(authMiddleware);
 
 // User API
-apiRouter.get("/api/users", authMiddleware, getUsers);
-apiRouter.get("/api/users/:id", authMiddleware, getUsersById);
-apiRouter.patch("/api/users/:id", authMiddleware, updateUser);
-apiRouter.delete("/api/users/:id", authMiddleware, deleteUser);
-apiRouter.patch("/api/logout", authMiddleware, Logout);
+apiRouter.get("/api/users", getUsers);
+apiRouter.get("/api/users/:id", getUserById);
+apiRouter.patch("/api/users/:id", updateUser);
+apiRouter.delete("/api/users/:id", deleteUser);
+apiRouter.patch("/api/logout", Logout);
+
+// Role API
+apiRouter.get("/api/roles", getRoles);
+apiRouter.patch("/api/roles", updateRole);
+apiRouter.delete("/api/roles", deleteRole);
+
+// Product API
+apiRouter.get("/api/products", getProducts);
+apiRouter.post("/api/products", createProduct);
+apiRouter.patch("/api/products/:id", updateProduct);
+apiRouter.delete("/api/products/:id", deleteProduct);
+
+// Order API
+apiRouter.get("/api/orders", getOrders);
+apiRouter.get("/api/orders/:id", getOrderById);
+apiRouter.post("/api/orders", createOrder);
+apiRouter.patch("/api/orders/:id", updateOrder);
+apiRouter.delete("/api/orders/:id", deleteOrder);
+
+apiRouter.get("/api/offline", getOfflineOrders);
+apiRouter.get("/api/online", getOnlineOrders);
