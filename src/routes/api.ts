@@ -27,6 +27,13 @@ import {
   getOrders,
   updateOrder,
 } from "../controller/order-controller";
+import {
+  createPayment,
+  deletePayment,
+  getPaymentById,
+  getPayments,
+  updatePayment,
+} from "../controller/payment-controller";
 
 export const apiRouter = express.Router();
 apiRouter.use(authMiddleware);
@@ -58,3 +65,10 @@ apiRouter.delete("/api/orders/:id", deleteOrder);
 
 apiRouter.get("/api/offline", getOfflineOrders);
 apiRouter.get("/api/online", getOnlineOrders);
+
+// Payment API
+apiRouter.get("/api/payments", getPayments);
+apiRouter.get("/api/payments/:id", getPaymentById);
+apiRouter.post("/api/payments", createPayment);
+apiRouter.patch("/api/payments/:id", updatePayment);
+apiRouter.delete("/api/payments/:id", deletePayment);
