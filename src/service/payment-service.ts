@@ -14,8 +14,15 @@ export const create = async (
 ): Promise<MessageResponse> => {
   const createPaymentRequest = validate(PaymentValidaton.CREATE, request);
 
+  const { order_id, amount, status, payment_method } = createPaymentRequest;
+
   await prismaClient.payment.create({
-    data: createPaymentRequest,
+    data: {
+      order_id,
+      amount,
+      status,
+      payment_method,
+    },
   });
 
   return {
