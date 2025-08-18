@@ -40,7 +40,7 @@ export const handleMidtransWebhook = async (
   next: NextFunction
 ) => {
   try {
-    if (!verifySignature(req)) {
+    if (!verifySignature(req.body)) {
       return res.status(403).json({ error: "Invalid signature" });
     }
 
