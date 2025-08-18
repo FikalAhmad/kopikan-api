@@ -39,7 +39,7 @@ export async function createEwalletTransaction(
   const { order_id, amount, customer_name, customer_email } = req;
 
   const payload = {
-    payment_type: "gopay",
+    payment_type: "qris",
     transaction_details: {
       order_id,
       gross_amount: amount,
