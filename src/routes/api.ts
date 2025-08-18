@@ -83,4 +83,4 @@ apiRouter.post("/api/products/filter/", getProductSalesPeriod);
 
 // Dashboard Management
 apiRouter.get("/api/get-customer", getCustomer);
-apiRouter.post("/api/payment/ewallet", createEwalletPayment);
+apiRouter.post("/api/payments/ewallet", createEwalletPayment);
