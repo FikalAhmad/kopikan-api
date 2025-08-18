@@ -89,6 +89,15 @@ export const verifySignature = (req: any) => {
     .update(input)
     .digest("hex");
 
+  console.log("🔎 Signature Debug:");
+  console.log("order_id       :", order_id);
+  console.log("status_code    :", status_code);
+  console.log("gross_amount   :", gross_amount);
+  console.log("server_key     :", process.env.MIDTRANS_SERVER_KEY);
+  console.log("input string   :", input);
+  console.log("expected sig   :", expectedSignature);
+  console.log("received sig   :", signature_key);
+
   return expectedSignature.toLowerCase() === signature_key.toLowerCase();
 };
 
