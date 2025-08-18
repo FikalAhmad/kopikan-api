@@ -94,7 +94,6 @@ export const verifySignature = (body: any) => {
 export const midtransWebhook = async (req: MidtransWebhookRequest) => {
   const { order_id, transaction_status } = req;
 
-  const orderId = order_id;
   const transactionStatus = transaction_status;
 
   let status = "pending";
@@ -109,7 +108,7 @@ export const midtransWebhook = async (req: MidtransWebhookRequest) => {
   }
 
   await prismaClient.payment.update({
-    where: { order_id: orderId },
+    where: { order_id },
     data: { status },
   });
 
