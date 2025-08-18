@@ -78,22 +78,18 @@ export async function createEwalletTransaction(
   return result;
 }
 
-export const verifySignature = (req: {
-  order_id: string;
-  status_code: string;
-  gross_amount: string;
-  signature_key: string;
-}) => {
+export const verifySignature = (req: any) => {
+  const { order_id, status_code, gross_amount, signature_key } = req;
+
   const input =
-    req.order_id +
-    req.status_code +
-    req.gross_amount +
-    process.env.MIDTRANS_SERVER_KEY;
+    order_id + status_code + gross_amount + process.env.MIDTRANS_SERVER_KEY;
+
   const expectedSignature = crypto
     .createHash("sha512")
     .update(input)
     .digest("hex");
-  return expectedSignature === req.signature_key;
+
+  return expectedSignature.toLowerCase() === signature_key.toLowerCase();
 };
 
 export const midtransWebhook = async (req: MidtransWebhookRequest) => {
