@@ -98,7 +98,7 @@ export const midtransWebhook = async (req: MidtransWebhookRequest) => {
 
   let status = "pending";
   if (transactionStatus === "settlement") {
-    status = "success";
+    status = "paid";
   } else if (
     transactionStatus === "cancel" ||
     transactionStatus === "expire" ||
