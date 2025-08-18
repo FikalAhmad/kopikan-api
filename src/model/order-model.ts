@@ -3,7 +3,7 @@ import { Order, OrderDetail, Product } from "@prisma/client";
 // Order
 export type OrderResponse = Order & {
   order_details: (OrderDetail & {
-    product: Product;
+    product?: Product;
   })[];
 };
 

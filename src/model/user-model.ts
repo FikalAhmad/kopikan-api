@@ -9,8 +9,8 @@ export type UserResponse = {
 
 export type CreateUserRequest = {
   name: string;
-  password: string;
   email: string;
+  password: string;
   phone: string;
   refresh_token?: string;
   role_id: string;

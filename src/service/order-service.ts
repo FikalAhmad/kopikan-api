@@ -9,9 +9,14 @@ import { MessageResponse } from "../types/globals.types";
 import { OrderValidaton } from "../validation/order-validation";
 import { validate } from "../validation/validation";
 
+interface AfterOrderResponse {
+  msg: string;
+  data: OrderResponse | null;
+}
+
 export const create = async (
   request: CreateOrderRequest
-): Promise<MessageResponse> => {
+): Promise<AfterOrderResponse> => {
   const createOrderRequest = validate(OrderValidaton.CREATE, request);
 
   const {
@@ -24,7 +29,7 @@ export const create = async (
 
   // Validasi input
   if (!customer_id || !order_type || !order_source || !order_items.length) {
-    return { msg: "Data tidak lengkap" };
+    return { msg: "Data tidak lengkap", data: null };
   }
 
   // 🔍 Ambil harga produk dari database untuk mencegah manipulasi harga
@@ -52,7 +57,7 @@ export const create = async (
     };
   });
 
-  await prismaClient.order.create({
+  const order = await prismaClient.order.create({
     data: {
       customer_id,
       order_type,
@@ -68,6 +73,7 @@ export const create = async (
 
   return {
     msg: "Order added successfully",
+    data: order,
   };
 };
 

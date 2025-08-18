@@ -12,10 +12,8 @@ export type PaymentResponse = {
 
 export type CreatePaymentRequest = {
   order_id: string;
-  payment_date: Date;
   amount: number;
-  status: string;
-  payment_method: string;
+  // payment_method: string;
   transaction_id: string | null;
 };
 

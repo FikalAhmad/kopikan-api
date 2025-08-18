@@ -101,6 +101,11 @@ export const get = async (): Promise<UserResponse[]> => {
       email: true,
       phone: true,
       role_id: true,
+      role: {
+        select: {
+          role_name: true,
+        },
+      },
     },
   });
   return user;

@@ -15,6 +15,7 @@ model User {
   phone         String  @unique
   role_id       String  @db.ObjectId
   refresh_token String?
+  createdAt   DateTime @default(now())
 
   role   Role    @relation(fields: [role_id], references: [id])
   orders Order[]
@@ -37,19 +38,22 @@ model Order {
   status           String        @default("pending") // pending, completed, canceled
   order_details    OrderDetail[]
   payment          Payment?
+  createdAt   DateTime @default(now())
 
   customer User @relation(fields: [customer_id], references: [id])
 }
 
 model OrderDetail {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  order_id    String @unique @db.ObjectId
-  product_id  String @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  order_id    String  @unique @db.ObjectId
+  product_id  String  @db.ObjectId
   qty         Int
   unit_price  Int
   total_price Int
+  createdAt   DateTime @default(now())
 
-  order   Order   @relation(fields: [order_id], references: [id])
+
+  order   Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
   product Product @relation(fields: [product_id], references: [id])
 }
 
@@ -67,11 +71,12 @@ model Product {
 model Payment {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   order_id       String   @unique @db.ObjectId
-  payment_date   DateTime @default(now())
+  payment_date   DateTime      @default(now())
   amount         Int
-  status         String // paid, pending, failed
+  status           String        @default("pending") // paid, pending, failed
   payment_method String // cash, card, e-wallet
   transaction_id String? // null jika pembayaran offline tapi dua"nya aja gak sih?
+  createdAt   DateTime @default(now())
 
-  order Order @relation(fields: [order_id], references: [id])
+  order Order @relation(fields: [order_id], references: [id],onDelete: Cascade)
 }

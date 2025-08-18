@@ -1,8 +1,8 @@
+import { Payment } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import {
   CreatePaymentRequest,
-  PaymentResponse,
   UpdatePaymentRequest,
 } from "../model/payment-model";
 import { MessageResponse } from "../types/globals.types";
@@ -14,14 +14,14 @@ export const create = async (
 ): Promise<MessageResponse> => {
   const createPaymentRequest = validate(PaymentValidaton.CREATE, request);
 
-  const { order_id, amount, status, payment_method } = createPaymentRequest;
+  const { order_id, amount } = createPaymentRequest;
 
   await prismaClient.payment.create({
     data: {
       order_id,
       amount,
-      status,
-      payment_method,
+      status: "paid",
+      payment_method: "cash",
     },
   });
 
@@ -30,7 +30,7 @@ export const create = async (
   };
 };
 
-export const get = async (): Promise<PaymentResponse[]> => {
+export const get = async (): Promise<Payment[]> => {
   const payment = await prismaClient.payment.findMany({
     include: {
       order: true,
@@ -39,7 +39,7 @@ export const get = async (): Promise<PaymentResponse[]> => {
   return payment;
 };
 
-export const getById = async (id: string): Promise<PaymentResponse> => {
+export const getById = async (id: string): Promise<Payment> => {
   const paymentById = await prismaClient.payment.findUnique({
     where: { id },
 
