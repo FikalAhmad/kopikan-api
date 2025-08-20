@@ -162,14 +162,15 @@ export const remove = async (id: string): Promise<MessageResponse> => {
 export const logout = async (
   refreshToken: string
 ): Promise<MessageResponse> => {
-  const result = await prismaClient.user.updateMany({
-    where: {
-      refresh_token: refreshToken,
-    },
-    data: {
-      refresh_token: null,
-    },
+  if (!refreshToken) {
+    throw new ResponseError(400, "Refresh token is required");
+  }
+
+  const result = await prismaClient.user.update({
+    where: { refresh_token: refreshToken },
+    data: { refresh_token: null },
   });
+
   if (!result) {
     throw new ResponseError(401, "Invalid refresh token");
   }
