@@ -159,7 +159,11 @@ export const remove = async (id: string): Promise<MessageResponse> => {
     where: { id },
   });
 
-  if (!removeOrder) {
+  if (removeOrder) {
+    await prismaClient.orderDetail.deleteMany({
+      where: { order_id: id },
+    });
+  } else {
     throw new ResponseError(404, "Order ID is not found");
   }
   return { msg: "Order deleted successfully" };
