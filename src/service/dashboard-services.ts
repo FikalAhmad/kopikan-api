@@ -1,6 +1,5 @@
 import { prismaClient } from "../application/database";
 
-// Fungsi untuk mendapatkan tanggal filter tanpa date-fns
 const getDateFilter = (period: string) => {
   const now = new Date();
   if (period === "7d") {
@@ -13,7 +12,6 @@ const getDateFilter = (period: string) => {
   return now;
 };
 
-// Fungsi utama untuk fetch data product sales by category
 export const getProductSales = async (request: { period: string }) => {
   const { period } = request;
   const dateFilter = getDateFilter(period);
@@ -25,7 +23,7 @@ export const getProductSales = async (request: { period: string }) => {
       },
       order: {
         payment: {
-          status: "paid", // hanya ambil order dengan payment "paid"
+          status: "paid",
         },
       },
     },
@@ -84,12 +82,113 @@ export const getProductSales = async (request: { period: string }) => {
   ];
 };
 
-export const getCustomerCount = async () => {
-  const data = await prismaClient.user.count({
+// export const getCustomerCount = async () => {
+//   const data = await prismaClient.user.count({
+//     where: {
+//       role_id: "6800a52eea8560606cbc4a25",
+//     },
+//   });
+
+//   return data;
+// };
+export const totalDashboardSummary = async () => {
+  const [totalCustomer, totalRevenue, totalOrder, totalOffline, totalOnline] =
+    await Promise.all([
+      prismaClient.user.aggregate({
+        where: {
+          role_id: "6800a52eea8560606cbc4a25",
+        },
+        _count: {
+          role_id: true,
+        },
+      }),
+
+      prismaClient.payment.aggregate({
+        _sum: { amount: true },
+      }),
+
+      prismaClient.payment.aggregate({
+        where: { status: "paid" },
+        _count: { order_id: true },
+      }),
+
+      prismaClient.payment.aggregate({
+        _count: { id: true },
+        where: {
+          status: "paid",
+          order: {
+            order_source: "offline",
+          },
+        },
+      }),
+
+      prismaClient.payment.aggregate({
+        _count: { id: true },
+        where: {
+          status: "paid",
+          order: {
+            order_source: "online",
+          },
+        },
+      }),
+    ]);
+
+  return {
+    totalCustomer: totalCustomer._count.role_id,
+    totalRevenue: totalRevenue._sum.amount,
+    totalOrder: totalOrder._count.order_id,
+    totalOrderOffline: totalOffline._count.id,
+    totalOrderOnline: totalOnline._count.id,
+  };
+};
+
+export const orderSummary = async (startDate?: Date, endDate?: Date) => {
+  const grouped = await prismaClient.orderDetail.groupBy({
+    by: ["product_id"],
+    _sum: {
+      qty: true,
+      total_price: true,
+    },
+    _count: {
+      order_id: true,
+    },
     where: {
-      role_id: "6800a52eea8560606cbc4a25",
+      order: {
+        payment: {
+          status: "paid",
+          ...(startDate && endDate
+            ? {
+                payment_date: {
+                  gte: startDate,
+                  lte: endDate,
+                },
+              }
+            : {}),
+        },
+      },
     },
   });
 
-  return data;
+  const products = await prismaClient.product.findMany({
+    where: {
+      id: { in: grouped.map((g) => g.product_id) },
+    },
+    select: {
+      id: true,
+      product_name: true,
+      image: true,
+    },
+  });
+
+  return grouped.map((item) => {
+    const product = products.find((p) => p.id === item.product_id);
+    return {
+      product_id: item.product_id,
+      product_name: product?.product_name,
+      product_image: product?.image,
+      total_qty: item._sum.qty,
+      total_sales: item._sum.total_price,
+      total_orders: item._count.order_id,
+    };
+  });
 };

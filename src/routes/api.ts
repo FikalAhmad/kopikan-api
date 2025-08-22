@@ -35,10 +35,12 @@ import {
   updatePayment,
 } from "../controller/payment-controller";
 import {
-  getCustomer,
+  getOrderSummary,
   getProductSalesPeriod,
+  getTotalDashboardSummary,
 } from "../controller/dashboard-controller";
 import { createEwalletPayment } from "../controller/midtrans-controller";
+import { totalDashboardSummary } from "../service/dashboard-services";
 
 export const apiRouter = express.Router();
 apiRouter.use(authMiddleware);
@@ -82,5 +84,7 @@ apiRouter.delete("/api/payments/:id", deletePayment);
 apiRouter.post("/api/products/filter/", getProductSalesPeriod);
 
 // Dashboard Management
-apiRouter.get("/api/get-customer", getCustomer);
 apiRouter.post("/api/payments/ewallet", createEwalletPayment);
+
+apiRouter.get("/api/dashboard/total-summary", getTotalDashboardSummary);
+apiRouter.get("/api/dashboard/order-summary", getOrderSummary);
