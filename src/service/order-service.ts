@@ -11,7 +11,17 @@ import { validate } from "../validation/validation";
 
 interface AfterOrderResponse {
   msg: string;
-  data: OrderResponse | null;
+  data: {
+    id: string;
+    customer_id: string;
+    order_date: Date;
+    order_type: string;
+    order_source: string;
+    delivery_address: string | null;
+    total: number;
+    status: string;
+    createdAt: Date;
+  } | null;
 }
 
 export const create = async (

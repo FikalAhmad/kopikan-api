@@ -41,6 +41,11 @@ import {
 } from "../controller/dashboard-controller";
 import { createEwalletPayment } from "../controller/midtrans-controller";
 import { totalDashboardSummary } from "../service/dashboard-services";
+import {
+  CancelOrderTransaction,
+  ConfirmPaymentTransaction,
+  CreateOrderTransaction,
+} from "../controller/transaction-controller";
 
 export const apiRouter = express.Router();
 apiRouter.use(authMiddleware);
@@ -88,3 +93,8 @@ apiRouter.post("/api/payments/ewallet", createEwalletPayment);
 
 apiRouter.get("/api/dashboard/total-summary", getTotalDashboardSummary);
 apiRouter.get("/api/dashboard/order-summary", getOrderSummary);
+
+// Transaction API
+apiRouter.post("/api/transaction", CreateOrderTransaction);
+apiRouter.post("/api/transaction/confirm", ConfirmPaymentTransaction);
+apiRouter.post("/api/transaction/cancel", CancelOrderTransaction);

@@ -82,15 +82,6 @@ export const getProductSales = async (request: { period: string }) => {
   ];
 };
 
-// export const getCustomerCount = async () => {
-//   const data = await prismaClient.user.count({
-//     where: {
-//       role_id: "6800a52eea8560606cbc4a25",
-//     },
-//   });
-
-//   return data;
-// };
 export const totalDashboardSummary = async () => {
   const [totalCustomer, totalRevenue, totalOrder, totalOffline, totalOnline] =
     await Promise.all([
