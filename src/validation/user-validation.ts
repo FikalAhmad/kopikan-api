@@ -24,7 +24,6 @@ export class UserValidaton {
       .min(5, { message: "Password must be 5 or more characters long" })
       .max(100)
       .optional(),
-    email: z.string().email({ message: "Invalid email address" }).optional(),
     phone: z.string().min(1).max(15).optional(),
     role_id: z.string().min(1).max(100).optional(),
   });

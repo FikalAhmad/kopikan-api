@@ -34,11 +34,7 @@ export const create = async (
 };
 
 export const get = async (): Promise<ProductResponse[]> => {
-  const product = await prismaClient.product.findMany({
-    include: {
-      order_details: true
-    }
-  });
+  const product = await prismaClient.product.findMany();
   return product;
 };
 

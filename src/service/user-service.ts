@@ -120,6 +120,7 @@ export const getById = async (id: string): Promise<UserResponse> => {
       email: true,
       phone: true,
       role_id: true,
+      role: true,
     },
   });
   if (!userById) {

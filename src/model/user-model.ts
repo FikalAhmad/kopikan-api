@@ -5,6 +5,9 @@ export type UserResponse = {
   phone: string;
   refresh_token?: string;
   role_id: string;
+  role: {
+    role_name: string;
+  };
 };
 
 export type CreateUserRequest = {
@@ -25,4 +28,5 @@ export type UpdateUserRequest = {
   name?: string;
   password?: string;
   phone?: string;
+  role_id?: string;
 };

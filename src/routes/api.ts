@@ -8,6 +8,7 @@ import {
 } from "../controller/user-controller";
 import { authMiddleware } from "../middleware/auth-middleware";
 import {
+  createRole,
   deleteRole,
   getRoles,
   updateRole,
@@ -46,6 +47,13 @@ import {
   ConfirmPaymentTransaction,
   CreateOrderTransaction,
 } from "../controller/transaction-controller";
+import {
+  createDiscount,
+  deleteDiscount,
+  getDiscount,
+  getDiscountbyId,
+  updateDiscount,
+} from "../controller/discount-controller";
 
 export const apiRouter = express.Router();
 apiRouter.use(authMiddleware);
@@ -58,6 +66,7 @@ apiRouter.delete("/api/users/:id", deleteUser);
 apiRouter.patch("/api/logout", Logout);
 
 // Role API
+apiRouter.post("/api/roles", createRole);
 apiRouter.get("/api/roles", getRoles);
 apiRouter.patch("/api/roles", updateRole);
 apiRouter.delete("/api/roles", deleteRole);
@@ -77,6 +86,13 @@ apiRouter.delete("/api/orders/:id", deleteOrder);
 
 apiRouter.get("/api/offline", getOfflineOrders);
 apiRouter.get("/api/online", getOnlineOrders);
+
+// Discount API
+apiRouter.get("/api/discounts", getDiscount);
+apiRouter.get("/api/discounts/:id", getDiscountbyId);
+apiRouter.post("/api/discounts", createDiscount);
+apiRouter.patch("/api/discounts", updateDiscount);
+apiRouter.delete("/api/discounts", deleteDiscount);
 
 // Payment API
 apiRouter.get("/api/payments", getPayments);
