@@ -1,81 +1,84 @@
-import { Payment } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import {
   CreatePaymentRequest,
+  PaymentResponse,
   UpdatePaymentRequest,
 } from "../model/payment-model";
-import { MessageResponse } from "../types/globals.types";
 import { PaymentValidaton } from "../validation/payment-validation";
 import { validate } from "../validation/validation";
+import { ApiResponse } from "../types/globals.types";
 
-export const create = async (
-  request: CreatePaymentRequest
-): Promise<MessageResponse> => {
-  const createPaymentRequest = validate(PaymentValidaton.CREATE, request);
+export class PaymentService {
+  static async create(
+    request: CreatePaymentRequest
+  ): Promise<ApiResponse<void>> {
+    const createPaymentRequest = validate(PaymentValidaton.CREATE, request);
 
-  const { order_id, amount } = createPaymentRequest;
+    const { order_id, amount, payment_method } = createPaymentRequest;
 
-  await prismaClient.payment.create({
-    data: {
-      order_id,
-      amount,
-      status: "paid",
-      payment_method: "cash",
-    },
-  });
+    await prismaClient.payment.create({
+      data: {
+        order_id,
+        amount,
+        payment_method,
+        status: "COMPLETED",
+      },
+    });
 
-  return {
-    msg: "Payment created successfully",
-  };
-};
-
-export const get = async (): Promise<Payment[]> => {
-  const payment = await prismaClient.payment.findMany({
-    include: {
-      order: true,
-    },
-  });
-  return payment;
-};
-
-export const getById = async (id: string): Promise<Payment> => {
-  const paymentById = await prismaClient.payment.findUnique({
-    where: { id },
-
-    include: {
-      order: true,
-    },
-  });
-  if (!paymentById) {
-    throw new ResponseError(404, "Order not found");
+    return {
+      success: true,
+      message: "Payment created successfully",
+    };
   }
-  return paymentById;
-};
 
-export const update = async (
-  id: string,
-  request: UpdatePaymentRequest
-): Promise<MessageResponse> => {
-  const updatePaymentRequest = validate(PaymentValidaton.UPDATE, request);
-
-  await prismaClient.payment.update({
-    where: {
-      id,
-    },
-    data: updatePaymentRequest,
-  });
-
-  return { msg: "Payment updated successfully" };
-};
-
-export const remove = async (id: string): Promise<MessageResponse> => {
-  const removePayment = await prismaClient.payment.delete({
-    where: { id },
-  });
-
-  if (!removePayment) {
-    throw new ResponseError(404, "Payment ID is not found");
+  static async get(): Promise<ApiResponse<PaymentResponse[]>> {
+    const payment = await prismaClient.payment.findMany({
+      include: {
+        order: true,
+      },
+    });
+    return { success: true, data: payment };
   }
-  return { msg: "Payment deleted successfully" };
-};
+
+  static async getById(id: string): Promise<ApiResponse<PaymentResponse>> {
+    const paymentById = await prismaClient.payment.findUnique({
+      where: { id },
+
+      include: {
+        order: true,
+      },
+    });
+    if (!paymentById) {
+      throw new ResponseError(404, "Order not found");
+    }
+    return { success: true, data: paymentById };
+  }
+
+  static async update(
+    id: string,
+    request: UpdatePaymentRequest
+  ): Promise<ApiResponse<void>> {
+    const updatePaymentRequest = validate(PaymentValidaton.UPDATE, request);
+
+    await prismaClient.payment.update({
+      where: {
+        id,
+      },
+      data: updatePaymentRequest,
+    });
+
+    return { success: true, message: "Payment updated successfully" };
+  }
+
+  static async remove(id: string): Promise<ApiResponse<void>> {
+    const removePayment = await prismaClient.payment.delete({
+      where: { id },
+    });
+
+    if (!removePayment) {
+      throw new ResponseError(404, "Payment ID is not found");
+    }
+    return { success: true, message: "Payment deleted successfully" };
+  }
+}

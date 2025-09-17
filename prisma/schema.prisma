@@ -27,21 +27,76 @@ model Role {
   users     User[]
 }
 
+model Product {
+  id            String                   @id @default(auto()) @map("_id") @db.ObjectId
+  product_name  String
+  image         String
+  category      String
+  description   String
+  price         Int
+
+  order_details          OrderDetail[]
+  options                ProductProductOption[]
+  inventory_transactions InventoryTransaction[]
+}
+
+model ProductOption {
+  id        String             @id @default(auto()) @map("_id") @db.ObjectId
+  name      String             // contoh: Size, Ice, Sweetness
+  createdAt DateTime           @default(now())
+
+  values   ProductOptionValue[]
+  products ProductProductOption[]
+}
+
+model ProductProductOption {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  product_id String   @db.ObjectId
+  option_id  String   @db.ObjectId
+  createdAt  DateTime @default(now())
+
+  product Product       @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  option  ProductOption @relation(fields: [option_id], references: [id], onDelete: Cascade)
+
+  @@unique([product_id, option_id])
+}
+
+model ProductOptionValue {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  option_id   String         @db.ObjectId
+  label       String         // contoh: Regular, Large, Less Ice, Extra Sweet
+  extra_price Int            @default(0) // contoh: Large +2000
+  createdAt   DateTime       @default(now())
+
+  option ProductOption @relation(fields: [option_id], references: [id], onDelete: Cascade)
+  order_options OrderDetailOption[]
+}
+
 model Order {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId
   customer_id      String        @db.ObjectId
   order_date       DateTime      @default(now())
-  order_type       String        // dine-in, takeaway, delivery
-  order_source     String        // offline, online
-  delivery_address String?       // null jika offline
+  order_source     OrderSource
+  delivery_address String?
   total            Int
-  status           String        @default("pending") // pending, completed, canceled
+  status           OrderStatus        @default(PENDING)
   createdAt        DateTime      @default(now())
 
   customer      User         @relation(fields: [customer_id], references: [id])
   order_details OrderDetail[]
   payment       Payment?
   discounts     OrderDiscount[]
+}
+
+enum OrderSource {
+  OFFLINE
+  ONLINE
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }
 
 model OrderDetail {
@@ -67,61 +122,41 @@ model OrderDetailOption {
   optionValue ProductOptionValue @relation(fields: [option_value_id], references: [id])
 }
 
-model Product {
-  id            String                   @id @default(auto()) @map("_id") @db.ObjectId
-  product_name  String
-  image         String
-  category      String
-  description   String
-  price         Int
-  stock         Int
-
-  order_details          OrderDetail[]
-  options                ProductOption[]
-  inventory_transactions InventoryTransaction[]
-}
-
-model ProductOption {
-  id         String             @id @default(auto()) @map("_id") @db.ObjectId
-  product_id String             @db.ObjectId
-  name       String             // contoh: Size, Ice, Sweetness
-  createdAt  DateTime           @default(now())
-
-  product Product             @relation(fields: [product_id], references: [id])
-  values  ProductOptionValue[]
-}
-
-model ProductOptionValue {
-  id          String         @id @default(auto()) @map("_id") @db.ObjectId
-  option_id   String         @db.ObjectId
-  label       String         // contoh: Regular, Large, Less Ice, Extra Sweet
-  extra_price Int            @default(0) // contoh: Large +2000
-  createdAt   DateTime       @default(now())
-
-  option ProductOption @relation(fields: [option_id], references: [id])
-  order_options OrderDetailOption[]
-}
-
 model Payment {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   order_id       String   @unique @db.ObjectId
   payment_date   DateTime @default(now())
   amount         Int
-  status         String   @default("pending") // paid, pending, failed
-  payment_method String   // cash, card, e-wallet
-  transaction_id String?  // null jika pembayaran offline
+  status         PaymentStatus   @default(PENDING)
+  payment_method PaymentMethod
   createdAt      DateTime @default(now())
 
   order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  CANCELED
+}
+
+enum PaymentMethod {
+  CASH
+  E_WALLET
+  QRIS
+  BANK_TRANSFER
+  // DEBIT_CARD
+  // CREDIT_CARD
 }
 
 model Discount {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   code         String   @unique
   description  String
-  type         String   // percentage, fixed
+  type         DiscountType
   value        Int
   min_purchase Int?     // minimum belanja (opsional)
+  max_discount Int?     // maximum discount (opsional)
   valid_days   String[] // contoh: ["Saturday", "Sunday"] (opsional)
   time_start   String?  // format "HH:mm", contoh "00:00"
   time_end     String?  // format "HH:mm", contoh "11:00"
@@ -131,6 +166,11 @@ model Discount {
   createdAt    DateTime @default(now())
 
   orders OrderDiscount[]
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
 }
 
 
@@ -147,10 +187,17 @@ model OrderDiscount {
 model InventoryTransaction {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   product_id  String   @db.ObjectId
-  type        String   // in, out, adjust
-  quantity    Int
+  type        StockMovementType
+  current_stock    Int
   reference   String?  // bisa simpan ID order atau keterangan lain
   createdAt   DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   product Product @relation(fields: [product_id], references: [id])
+}
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  WASTE
 }

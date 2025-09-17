@@ -3,8 +3,9 @@ export type UserResponse = {
   name: string;
   email: string;
   phone: string;
-  refresh_token?: string;
+  refresh_token?: string | null;
   role_id: string;
+  createdAt: Date;
   role: {
     role_name: string;
   };

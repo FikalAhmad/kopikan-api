@@ -1,35 +1,36 @@
-import { Order, OrderDetail, Product } from "@prisma/client";
+import {
+  Order,
+  OrderDetail,
+  OrderDetailOption,
+  OrderDiscount,
+  OrderSource,
+  OrderStatus,
+  Product,
+} from "@prisma/client";
 
 // Order
 export type OrderResponse = Order & {
   order_details: (OrderDetail & {
-    product?: Product;
+    options?: OrderDetailOption[];
   })[];
+} & {
+  discounts: OrderDiscount[];
 };
 
 export type CreateOrderRequest = {
   customer_id: string;
-  order_date: Date;
-  order_type: string;
-  order_source: string;
+  order_source: OrderSource;
   delivery_address?: string;
-  total: number;
-  status: string;
   order_items: {
     product_id: string;
     qty: number;
-    unit_price: number;
+    options: string[];
   }[];
+  discounts: string[];
 };
 
 export type UpdateOrderRequest = {
-  customer_id?: string;
-  order_date?: Date;
-  order_type?: string;
-  order_source?: string;
-  delivery_address?: string;
-  total?: number;
-  status?: string;
+  status?: OrderStatus;
 };
 
 // Order Detail

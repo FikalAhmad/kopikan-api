@@ -4,31 +4,22 @@ import { z, ZodType } from "zod";
 export class OrderValidaton {
   static readonly CREATE: ZodType = z.object({
     customer_id: z.string().min(1).max(100),
-    // order_date: z.string().datetime({ offset: true }),
-    order_type: z.string().min(1).max(10),
-    order_source: z.string().min(1).max(10),
+    order_source: z.enum(["OFFLINE", "ONLINE"] as const),
     delivery_address: z.string().min(1).max(100).optional(),
-    // total: z.number().min(1).max(1000000000),
-    // status: z.string().min(1).max(10),
     order_items: z
       .array(
         z.object({
           product_id: z.string().min(1, "Product ID tidak boleh kosong"),
           qty: z.number().min(1, "Jumlah harus minimal 1"),
-          // unit_price: z.number().min(1, "Harga satuan harus minimal 1"),
+          options: z.array(z.string().min(1).max(100)),
         })
       )
       .min(1, "Harus ada minimal 1 produk dalam order"),
+    discounts: z.array(z.string().min(1).max(100)),
   });
 
   static readonly UPDATE: ZodType = z.object({
-    customer_id: z.string().min(1).max(100).optional(),
-    // order_date: z.string().datetime().optional(),
-    order_type: z.string().min(1).max(10).optional(),
-    order_source: z.string().min(1).max(10).optional(),
-    delivery_address: z.string().min(1).max(100).optional(),
-    total: z.number().optional(),
-    status: z.string().min(1).max(10).optional(), // kalau error berarti ini di komen
+    status: z.enum(["PENDING", "COMPLETED", "CANCELLED"] as const).optional(),
   });
 }
 // ORDER DETAIL

@@ -5,56 +5,66 @@ import {
   RoleResponse,
   UpdateRoleRequest,
 } from "../model/role-model";
-import { MessageResponse } from "../types/globals.types";
+import { ApiResponse } from "../types/globals.types";
 
-export const create = async (
-  request: CreateRoleRequest
-): Promise<MessageResponse> => {
-  const checkRoleExist = await prismaClient.role.count({
-    where: {
-      role_name: request.role_name,
-    },
-  });
+export class RoleService {
+  static async create(request: CreateRoleRequest): Promise<ApiResponse<void>> {
+    const checkRoleExist = await prismaClient.role.count({
+      where: {
+        role_name: request.role_name,
+      },
+    });
 
-  if (checkRoleExist !== 0) {
-    throw new ResponseError(400, "Role already exists");
+    if (checkRoleExist !== 0) {
+      throw new ResponseError(400, "Role already exists");
+    }
+
+    await prismaClient.role.create({
+      data: request,
+    });
+
+    return {
+      success: true,
+      message: "Add role successfully",
+    };
   }
 
-  await prismaClient.role.create({
-    data: request,
-  });
-
-  return {
-    msg: "Add role successfully",
-  };
-};
-
-export const get = async (): Promise<RoleResponse[]> => {
-  const role = await prismaClient.role.findMany();
-  return role;
-};
-
-export const update = async (
-  id: string,
-  request: UpdateRoleRequest
-): Promise<MessageResponse> => {
-  await prismaClient.role.update({
-    where: {
-      id,
-    },
-    data: request,
-  });
-
-  return { msg: "Updated role successfully" };
-};
-
-export const remove = async (id: string): Promise<MessageResponse> => {
-  const removeRole = await prismaClient.role.delete({
-    where: { id },
-  });
-
-  if (!removeRole) {
-    throw new ResponseError(404, "Role ID is not found");
+  static async get(): Promise<ApiResponse<RoleResponse[]>> {
+    const role = await prismaClient.role.findMany();
+    return {
+      success: true,
+      data: role,
+    };
   }
-  return { msg: "Deleted role successfully" };
-};
+
+  static async update(
+    id: string,
+    request: UpdateRoleRequest
+  ): Promise<ApiResponse<RoleResponse>> {
+    const roleUpdate = await prismaClient.role.update({
+      where: {
+        id,
+      },
+      data: request,
+    });
+
+    return {
+      success: true,
+      data: roleUpdate,
+    };
+  }
+
+  static async remove(id: string): Promise<ApiResponse<void>> {
+    const removeRole = await prismaClient.role.delete({
+      where: { id },
+    });
+
+    if (!removeRole) {
+      throw new ResponseError(404, "Role ID is not found");
+    }
+    return {
+      success: true,
+      message: "Deleted role successfully",
+    };
+  }
+}

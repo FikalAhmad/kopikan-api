@@ -3,77 +3,57 @@ import {
   CreateDiscountRequest,
   UpdateDiscountRequest,
 } from "../model/discount-model";
-import {
-  create,
-  get,
-  getById,
-  remove,
-  update,
-} from "../service/discount-services";
+import { DiscountService } from "../service/discount-services";
 
-export const getDiscount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const response = await get();
-    res.status(200).json(response);
-  } catch (error) {
-    next(error);
+export class DiscountController {
+  static async getDiscount(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await DiscountService.get();
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
   }
-};
 
-export const getDiscountbyId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const response = await getById(req.params.id);
-    res.status(200).json(response);
-  } catch (error) {
-    next(error);
+  static async getDiscountbyId(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const response = await DiscountService.getById(req.params.id);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
   }
-};
 
-export const createDiscount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const request: CreateDiscountRequest = req.body as CreateDiscountRequest;
-    const response = await create(request);
-    res.status(200).json(response);
-  } catch (error) {
-    next(error);
+  static async createDiscount(req: Request, res: Response, next: NextFunction) {
+    try {
+      const request: CreateDiscountRequest = req.body as CreateDiscountRequest;
+      const response = await DiscountService.create(request);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
   }
-};
 
-export const updateDiscount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const request: UpdateDiscountRequest = req.body as UpdateDiscountRequest;
-    const response = await update(req.params.id, request);
-    res.status(200).json(response);
-  } catch (error) {
-    next(error);
+  static async updateDiscount(req: Request, res: Response, next: NextFunction) {
+    try {
+      const request: UpdateDiscountRequest = req.body as UpdateDiscountRequest;
+      const response = await DiscountService.update(req.params.id, request);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
   }
-};
 
-export const deleteDiscount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const response = await remove(req.params.id);
-    return res.status(200).json(response);
-  } catch (error) {
-    next(error);
+  static async deleteDiscount(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await DiscountService.remove(req.params.id);
+      return res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
   }
-};
+}

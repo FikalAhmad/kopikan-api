@@ -4,7 +4,7 @@ export class DiscountValidaton {
   static readonly CREATE: ZodType = z.object({
     code: z.string().min(1).max(100),
     description: z.string().min(1).max(10000),
-    type: z.string().min(1).max(100),
+    type: z.enum(["PERCENTAGE", "FIXED_AMOUNT"] as const),
     value: z.number().lte(1000000),
     min_purchase: z.number().lte(100000).optional(),
     valid_days: z.array(z.string().min(1).max(100)).optional(),
@@ -18,7 +18,7 @@ export class DiscountValidaton {
   static readonly UPDATE: ZodType = z.object({
     code: z.string().min(1).max(100).optional(),
     description: z.string().min(1).max(10000).optional(),
-    type: z.string().min(1).max(100).optional(),
+    type: z.enum(["PERCENTAGE", "FIXED_AMOUNT"] as const).optional(),
     value: z.number().lte(1000000).optional(),
     min_purchase: z.number().lte(100000).optional(),
     valid_days: z.array(z.string().min(1).max(100)).optional(),

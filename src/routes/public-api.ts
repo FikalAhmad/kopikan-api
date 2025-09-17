@@ -1,18 +1,18 @@
 import express from "express";
-import { Login, Register } from "../controller/user-controller";
+import { UserController } from "../controller/user-controller";
 import { refreshToken } from "../controller/refresh-token";
-import {
-  createMidtransPayment,
-  handleMidtransWebhook,
-} from "../controller/midtrans-controller";
+import { MidtransController } from "../controller/midtrans-controller";
 
 export const publicRouter = express.Router();
 
 // Auth API
 publicRouter.get("/api/token", refreshToken);
-publicRouter.post("/api/register", Register);
-publicRouter.post("/api/login", Login);
+publicRouter.post("/api/register", UserController.Register);
+publicRouter.post("/api/login", UserController.Login);
 
 // Midtrans API
-publicRouter.post("/api/midpayment", createMidtransPayment);
-publicRouter.post("/api/payments/webhook", handleMidtransWebhook);
+// publicRouter.post("/api/midpayment", MidtransController.createMidtransPayment);
+publicRouter.post(
+  "/api/payments/webhook",
+  MidtransController.handleMidtransWebhook
+);

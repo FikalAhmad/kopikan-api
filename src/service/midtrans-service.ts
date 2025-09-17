@@ -1,116 +1,127 @@
+import { PaymentMethod, PaymentStatus } from "@prisma/client";
 import { prismaClient } from "../application/database";
-import { snap } from "../application/web";
+// import { snap } from "../application/web";
 import {
   CreateEwalletPaymentRequest,
-  CreateMidtransRequest,
+  // CreateMidtransRequest,
   MidtransWebhookRequest,
 } from "../model/midtrans-model";
-import { MidtransValidaton } from "../validation/midtrans-validation";
-import { validate } from "../validation/validation";
+// import { MidtransValidaton } from "../validation/midtrans-validation";
+// import { validate } from "../validation/validation";
 import crypto from "crypto";
 
 const MIDTRANS_API_URL = "https://api.sandbox.midtrans.com/v2/charge";
 
-export const createMidtrans = async (req: CreateMidtransRequest) => {
-  const createMidtransPaymentRequest = validate(MidtransValidaton.CREATE, req);
+export class MidtransService {
+  // SNAP METHOD
+  // static async createMidtrans(req: CreateMidtransRequest) {
+  //   const createMidtransPaymentRequest = validate(
+  //     MidtransValidaton.CREATE,
+  //     req
+  //   );
 
-  const { order_id, gross_amount, customer_name, customer_email } =
-    createMidtransPaymentRequest;
+  //   const { order_id, gross_amount, customer_name, customer_email } =
+  //     createMidtransPaymentRequest;
 
-  const parameter = {
-    transaction_details: {
-      order_id: order_id,
-      gross_amount: gross_amount,
-    },
-    customer_details: {
-      first_name: customer_name,
-      email: customer_email,
-    },
-  };
+  //   const parameter = {
+  //     transaction_details: {
+  //       order_id: order_id,
+  //       gross_amount: gross_amount,
+  //     },
+  //     customer_details: {
+  //       first_name: customer_name,
+  //       email: customer_email,
+  //     },
+  //   };
 
-  const transaction = await snap.createTransaction(parameter);
-  const snapToken = transaction.token;
-  return { snapToken };
-};
+  //   const transaction = await snap.createTransaction(parameter);
+  //   const snapToken = transaction.token;
+  //   return { snapToken };
+  // }
 
-export async function createEwalletTransaction(
-  req: CreateEwalletPaymentRequest
-) {
-  const { order_id, amount, customer_name, customer_email } = req;
+  static async createEwalletTransaction(req: CreateEwalletPaymentRequest) {
+    const { order_id, amount, customer_name, customer_email, payment_method } =
+      req;
 
-  const payload = {
-    payment_type: "qris",
-    transaction_details: {
-      order_id,
-      gross_amount: amount,
-    },
-    customer_details: {
-      first_name: customer_name,
-      email: customer_email,
-    },
-    // gopay: {
-    //   enable_callback: true,
-    //   callback_url: "https://yourdomain.com/payment/callback",
-    // },
-  };
+    const ewallet = ["gopay", "shopeepay", "ovo", "dana"];
 
-  const midtransRes = await fetch(MIDTRANS_API_URL, {
-    method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization:
-        "Basic " + Buffer.from(process.env.SERVER_KEY + ":").toString("base64"),
-    },
-  });
+    const payload = {
+      payment_type: payment_method.toLowerCase(),
+      transaction_details: {
+        order_id,
+        gross_amount: amount,
+      },
+      customer_details: {
+        first_name: customer_name,
+        email: customer_email,
+      },
+      // gopay: {
+      //   enable_callback: true,
+      //   callback_url: "https://yourdomain.com/payment/callback",
+      // },
+    };
 
-  const result = await midtransRes.json();
+    const midtransRes = await fetch(MIDTRANS_API_URL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Basic " +
+          Buffer.from(process.env.SERVER_KEY + ":").toString("base64"),
+      },
+    });
 
-  await prismaClient.payment.create({
-    data: {
-      order_id: order_id,
-      amount,
-      payment_method: "qris",
-      transaction_id: result.transaction_id,
-    },
-  });
+    const result = await midtransRes.json();
 
-  return result;
-}
+    await prismaClient.payment.create({
+      data: {
+        order_id: order_id,
+        amount,
+        payment_method: ewallet.includes(payment_method)
+          ? "E_WALLET"
+          : (payment_method as PaymentMethod),
+      },
+    });
 
-export const verifySignature = (req: any) => {
-  const { order_id, status_code, gross_amount, signature_key } = req;
-
-  const input = order_id + status_code + gross_amount + process.env.SERVER_KEY;
-
-  const expectedSignature = crypto
-    .createHash("sha512")
-    .update(input)
-    .digest("hex");
-
-  return expectedSignature.toLowerCase() === signature_key.toLowerCase();
-};
-
-export const midtransWebhook = async (req: MidtransWebhookRequest) => {
-  const { order_id, transaction_status } = req;
-
-  const transactionStatus = transaction_status;
-
-  let status = "pending";
-  if (transactionStatus === "settlement") {
-    status = "paid";
-  } else if (
-    transactionStatus === "cancel" ||
-    transactionStatus === "expire" ||
-    transactionStatus === "deny"
-  ) {
-    status = "failed";
+    return result;
   }
 
-  await prismaClient.payment.update({
-    where: { order_id },
-    data: { status },
-  });
+  static async verifySignature(req: any) {
+    const { order_id, status_code, gross_amount, signature_key } = req;
 
-  return { message: "OK" };
-};
+    const input =
+      order_id + status_code + gross_amount + process.env.SERVER_KEY;
+
+    const expectedSignature = crypto
+      .createHash("sha512")
+      .update(input)
+      .digest("hex");
+
+    return expectedSignature.toLowerCase() === signature_key.toLowerCase();
+  }
+
+  static async midtransWebhook(req: MidtransWebhookRequest) {
+    const { order_id, transaction_status } = req;
+
+    const transactionStatus = transaction_status;
+
+    let status = "PENDING" as PaymentStatus;
+    if (transactionStatus === "settlement") {
+      status = "COMPLETED";
+    } else if (
+      transactionStatus === "cancel" ||
+      transactionStatus === "expire" ||
+      transactionStatus === "deny"
+    ) {
+      status = "CANCELED";
+    }
+
+    await prismaClient.payment.update({
+      where: { order_id },
+      data: { status },
+    });
+
+    return { message: "OK" };
+  }
+}

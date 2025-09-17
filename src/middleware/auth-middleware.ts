@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import "dotenv/config";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { UserRequest } from "../types/user-request";
 import { User } from "@prisma/client";
 
+interface UserRequest extends Request {
+  user?: User;
+}
 export const authMiddleware = async (
   req: UserRequest,
   res: Response,
