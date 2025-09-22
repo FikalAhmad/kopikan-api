@@ -2,10 +2,10 @@ import { prismaClient } from "../application/database";
 import {
   CreateProductOptionRequest,
   CreateProductOptionValueRequest,
-  CreateProductProductOptionRequest,
+  // ProductProductOptionResponse,
+  // CreateProductProductOptionRequest,
   ProductOptionResponse,
   ProductOptionValueResponse,
-  ProductProductOptionResponse,
   UpdateProductOptionRequest,
   UpdateProductOptionValueRequest,
 } from "../model/product-option-model";
@@ -13,7 +13,7 @@ import { ApiResponse } from "../types/globals.types";
 import {
   ProductOptionValidation,
   ProductOptionValueValidation,
-  ProductProductOptionValidation,
+  // ProductProductOptionValidation,
 } from "../validation/product-option-validation";
 import { validate } from "../validation/validation";
 
@@ -129,34 +129,34 @@ export class ProductOptionValueService {
   }
 }
 
-export class ProductProductOptionService {
-  static async createPPO(
-    request: CreateProductProductOptionRequest
-  ): Promise<ApiResponse<void>> {
-    const createProductProductOptionRequest = validate(
-      ProductProductOptionValidation.CREATE,
-      request
-    );
+// export class ProductProductOptionService {
+//   static async createPPO(
+//     request: CreateProductProductOptionRequest
+//   ): Promise<ApiResponse<void>> {
+//     const createProductProductOptionRequest = validate(
+//       ProductProductOptionValidation.CREATE,
+//       request
+//     );
 
-    await prismaClient.productProductOption.create({
-      data: createProductProductOptionRequest,
-    });
+//     await prismaClient.productProductOption.create({
+//       data: createProductProductOptionRequest,
+//     });
 
-    return {
-      success: true,
-      message: "link product with option successfully",
-    };
-  }
+//     return {
+//       success: true,
+//       message: "link product with option successfully",
+//     };
+//   }
 
-  static async getPPO(): Promise<ApiResponse<ProductProductOptionResponse[]>> {
-    const ppo = await prismaClient.productProductOption.findMany({
-      include: {
-        option: {
-          include: { values: true },
-        },
-      },
-    });
+//   static async getPPO(): Promise<ApiResponse<ProductProductOptionResponse[]>> {
+//     const ppo = await prismaClient.productProductOption.findMany({
+//       include: {
+//         option: {
+//           include: { values: true },
+//         },
+//       },
+//     });
 
-    return { success: true, data: ppo };
-  }
-}
+//     return { success: true, data: ppo };
+//   }
+// }

@@ -14,14 +14,6 @@ export interface ProductOptionResponse {
   values: ProductOptionValueResponse[];
 }
 
-export interface ProductProductOptionResponse {
-  id: string;
-  product_id: string;
-  option_id: string;
-  createdAt: Date;
-  option: ProductOptionResponse;
-}
-
 // TODO====================Create====================
 export type CreateProductOptionValueRequest = {
   option_id: string;
@@ -30,12 +22,8 @@ export type CreateProductOptionValueRequest = {
 };
 
 export type CreateProductOptionRequest = {
-  name: string;
-};
-
-export type CreateProductProductOptionRequest = {
   product_id: string;
-  option_id: string;
+  name: string;
 };
 
 // TODO====================Update====================
@@ -47,5 +35,3 @@ export type UpdateProductOptionValueRequest = {
 export type UpdateProductOptionRequest = {
   name: string;
 };
-
-export type UpdateProductProductOptionRequest = {};

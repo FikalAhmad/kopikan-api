@@ -186,10 +186,6 @@ export class UserService {
   }
 
   static async logout(refreshToken: string): Promise<ApiResponse<void>> {
-    if (!refreshToken) {
-      throw new ResponseError(400, "Refresh token is required");
-    }
-
     const result = await prismaClient.user.update({
       where: { refresh_token: refreshToken },
       data: { refresh_token: null },

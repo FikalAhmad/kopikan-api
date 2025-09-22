@@ -30,6 +30,7 @@ export class OrderDetailValidaton {
     qty: z.number().gte(1).lte(500),
     unit_price: z.number().lte(1000000),
     total_price: z.number().gte(1000000000),
+    options: z.array(z.string().min(1).max(100)),
   });
 
   static readonly UPDATE: ZodType = z.object({

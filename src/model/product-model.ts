@@ -1,4 +1,8 @@
-import { ProductProductOptionResponse } from "./product-option-model";
+import {
+  CreateProductOptionRequest,
+  CreateProductOptionValueRequest,
+  ProductOptionResponse,
+} from "./product-option-model";
 
 export type ProductResponse = {
   id: string;
@@ -16,7 +20,13 @@ export type ProductWithOptionResponse = {
   category: string;
   description: string;
   price: number;
-  options: ProductProductOptionResponse[];
+  options: ProductOptionResponse[];
+};
+
+export type CreateProductOption = {
+  product_id: string;
+  name: string;
+  // values:
 };
 
 export type CreateProductRequest = {
@@ -25,12 +35,32 @@ export type CreateProductRequest = {
   category: string;
   description: string;
   price: number;
+  options: {
+    name: string;
+    values: {
+      label: string;
+      extra_price: number;
+    }[];
+  }[];
 };
 
-export type UpdateProductRequest = {
+export interface ProductOptionValue {
+  id?: string;
+  label: string;
+  extra_price?: number;
+}
+
+export interface ProductOption {
+  id?: string;
+  name: string;
+  values?: ProductOptionValue[];
+}
+
+export interface UpdateProductRequest {
   product_name?: string;
   image?: string;
   category?: string;
   description?: string;
   price?: number;
-};
+  options?: ProductOption[];
+}

@@ -43,7 +43,7 @@ export class MidtransService {
     const { order_id, amount, customer_name, customer_email, payment_method } =
       req;
 
-    const ewallet = ["gopay", "shopeepay", "ovo", "dana"];
+    const ewallet = ["gopay", "shopeepay", "ovo", "dana, linkaja"];
 
     const payload = {
       payment_type: payment_method.toLowerCase(),
@@ -116,6 +116,7 @@ export class MidtransService {
     ) {
       status = "CANCELED";
     }
+    console.log("ini status testing: " + transactionStatus);
 
     await prismaClient.payment.update({
       where: { order_id },

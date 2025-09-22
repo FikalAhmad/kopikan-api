@@ -111,8 +111,10 @@ export class UserController {
 
   static async Logout(req: Request, res: Response, next: NextFunction) {
     try {
-      const refreshToken = req.cookies.refreshToken;
-      const response = await UserService.logout(refreshToken);
+      console.log("ini token:" + req.cookies.token);
+
+      const refresh_token = req.cookies.token;
+      const response = await UserService.logout(refresh_token);
 
       res.clearCookie("refreshToken", {
         httpOnly: true,

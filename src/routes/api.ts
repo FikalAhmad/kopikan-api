@@ -6,7 +6,7 @@ import { ProductController } from "../controller/product-controller";
 import { OrderController } from "../controller/order-controller";
 import { PaymentController } from "../controller/payment-controller";
 import { DashboardController } from "../controller/dashboard-controller";
-// import { createEwalletPayment } from "../controller/midtrans-controller";
+import { MidtransController } from "../controller/midtrans-controller";
 // import {
 //   CancelOrderTransaction,
 //   ConfirmPaymentTransaction,
@@ -17,7 +17,7 @@ import { InventoryController } from "../controller/inventory-controller";
 import {
   ProductOptionController,
   ProductOptionValueController,
-  ProductProductOptionController,
+  // ProductProductOptionController,
 } from "../controller/product-option-controller";
 
 export const apiRouter = express.Router();
@@ -28,7 +28,6 @@ apiRouter.get("/api/users", UserController.getUsers);
 apiRouter.get("/api/users/:id", UserController.getUserById);
 apiRouter.patch("/api/users/:id", UserController.updateUser);
 apiRouter.delete("/api/users/:id", UserController.deleteUser);
-apiRouter.patch("/api/logout", UserController.Logout);
 
 // Role API
 apiRouter.post("/api/roles", RoleController.createRole);
@@ -76,14 +75,14 @@ apiRouter.delete(
 );
 
 // ProductProductOption API
-apiRouter.get(
-  "/api/product/product/options",
-  ProductProductOptionController.getProductProductOption
-);
-apiRouter.post(
-  "/api/product/product/options",
-  ProductProductOptionController.createProductProductOption
-);
+// apiRouter.get(
+//   "/api/product/product/options",
+//   ProductProductOptionController.getProductProductOption
+// );
+// apiRouter.post(
+//   "/api/product/product/options",
+//   ProductProductOptionController.createProductProductOption
+// );
 
 // Order API
 apiRouter.get("/api/orders", OrderController.getOrders);
@@ -123,7 +122,10 @@ apiRouter.post(
 );
 
 // Dashboard Management
-// apiRouter.post("/api/payments/ewallet", createEwalletPayment);
+apiRouter.post(
+  "/api/payments/ewallet",
+  MidtransController.createEwalletPayment
+);
 apiRouter.get(
   "/api/dashboard/total-summary",
   DashboardController.getTotalDashboardSummary

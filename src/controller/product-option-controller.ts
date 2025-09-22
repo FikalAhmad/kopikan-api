@@ -2,12 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import {
   ProductOptionService,
   ProductOptionValueService,
-  ProductProductOptionService,
+  // ProductProductOptionService,
 } from "../service/product-option-services";
 import {
   CreateProductOptionRequest,
   CreateProductOptionValueRequest,
-  CreateProductProductOptionRequest,
+  // CreateProductProductOptionRequest,
   UpdateProductOptionRequest,
   UpdateProductOptionValueRequest,
 } from "../model/product-option-model";
@@ -134,32 +134,32 @@ export class ProductOptionValueController {
   }
 }
 
-export class ProductProductOptionController {
-  static async createProductProductOption(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const request: CreateProductProductOptionRequest =
-        req.body as CreateProductProductOptionRequest;
-      const response = await ProductProductOptionService.createPPO(request);
-      res.status(200).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
+// export class ProductProductOptionController {
+//   static async createProductProductOption(
+//     req: Request,
+//     res: Response,
+//     next: NextFunction
+//   ) {
+//     try {
+//       const request: CreateProductProductOptionRequest =
+//         req.body as CreateProductProductOptionRequest;
+//       const response = await ProductProductOptionService.createPPO(request);
+//       res.status(200).json(response);
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
 
-  static async getProductProductOption(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const response = await ProductProductOptionService.getPPO();
-      res.status(200).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-}
+//   static async getProductProductOption(
+//     req: Request,
+//     res: Response,
+//     next: NextFunction
+//   ) {
+//     try {
+//       const response = await ProductProductOptionService.getPPO();
+//       res.status(200).json(response);
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+// }

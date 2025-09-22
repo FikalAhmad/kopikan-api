@@ -29,36 +29,25 @@ model Role {
 
 model Product {
   id            String                   @id @default(auto()) @map("_id") @db.ObjectId
-  product_name  String
+  product_name  String                   @unique
   image         String
   category      String
   description   String
   price         Int
 
   order_details          OrderDetail[]
-  options                ProductProductOption[]
+  options                ProductOption[]
   inventory_transactions InventoryTransaction[]
 }
 
 model ProductOption {
   id        String             @id @default(auto()) @map("_id") @db.ObjectId
+  product_id String           @db.ObjectId
   name      String             // contoh: Size, Ice, Sweetness
   createdAt DateTime           @default(now())
 
+  product   Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
   values   ProductOptionValue[]
-  products ProductProductOption[]
-}
-
-model ProductProductOption {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  product_id String   @db.ObjectId
-  option_id  String   @db.ObjectId
-  createdAt  DateTime @default(now())
-
-  product Product       @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  option  ProductOption @relation(fields: [option_id], references: [id], onDelete: Cascade)
-
-  @@unique([product_id, option_id])
 }
 
 model ProductOptionValue {
@@ -71,6 +60,20 @@ model ProductOptionValue {
   option ProductOption @relation(fields: [option_id], references: [id], onDelete: Cascade)
   order_options OrderDetailOption[]
 }
+
+// model ProductProductOption {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   product_id String   @db.ObjectId
+//   option_id  String   @db.ObjectId
+//   createdAt  DateTime @default(now())
+
+//   product Product       @relation(fields: [product_id], references: [id], onDelete: Cascade)
+//   option  ProductOption @relation(fields: [option_id], references: [id], onDelete: Cascade)
+
+//   @@unique([product_id, option_id])
+// }
+
+
 
 model Order {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId

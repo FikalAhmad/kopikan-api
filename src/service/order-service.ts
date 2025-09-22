@@ -13,7 +13,7 @@ export class OrderService {
   static async create(
     request: CreateOrderRequest
   ): Promise<ApiResponse<OrderResponse>> {
-    const createOrderRequest = validate(OrderValidaton.CREATE, request);
+    // const createOrderRequest = validate(OrderValidaton.CREATE, request);
 
     const {
       customer_id,
@@ -21,7 +21,7 @@ export class OrderService {
       delivery_address,
       order_items,
       discounts,
-    } = createOrderRequest;
+    } = request;
 
     const result = await prismaClient.$transaction(async (tx) => {
       let subtotal = 0;
@@ -36,8 +36,9 @@ export class OrderService {
         if (!product) throw new Error("Product not found");
 
         // Ambil opsi yang dipilih
+        const optionValueIds = item.options.map((opt) => opt.values.id);
         const optionValues = await tx.productOptionValue.findMany({
-          where: { id: { in: item.options || [] } },
+          where: { id: { in: optionValueIds || [] } },
         });
 
         // Hitung extra price total dari semua option
@@ -56,19 +57,23 @@ export class OrderService {
 
         // Simpan untuk insert ke prisma
         orderDetailsData.push({
-          product_id: product.id,
           qty: item.qty,
           unit_price: finalUnitPrice,
           total_price: totalPrice,
+          product: {
+            connect: { id: product.id },
+          },
           options: {
-            create: item.options?.map((optId: string) => ({
-              option_value_id: optId,
+            create: item.options.map((opt) => ({
+              optionValue: {
+                connect: { id: opt.values.id },
+              },
             })),
           },
         });
       }
 
-      // Hitung total dengan diskon (seperti logic yang tadi saya buat)
+      // Hitung total dengan diskon
       let total = subtotal;
       if (discounts?.length) {
         const activeDiscounts = await tx.discount.findMany({
@@ -98,7 +103,6 @@ export class OrderService {
         }
       }
 
-      // Simpan order
       const order = await tx.order.create({
         data: {
           customer_id,

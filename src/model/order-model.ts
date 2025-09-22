@@ -5,7 +5,6 @@ import {
   OrderDiscount,
   OrderSource,
   OrderStatus,
-  Product,
 } from "@prisma/client";
 
 // Order
@@ -24,7 +23,15 @@ export type CreateOrderRequest = {
   order_items: {
     product_id: string;
     qty: number;
-    options: string[];
+    options: {
+      id: string;
+      name: string;
+      values: {
+        id: string;
+        label: string;
+        extra_price: number;
+      };
+    }[];
   }[];
   discounts: string[];
 };
