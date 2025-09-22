@@ -1,4 +1,5 @@
 import { prismaClient } from "../application/database";
+import { ApiResponse } from "../types/globals.types";
 
 const getDateFilter = (period: string) => {
   const now = new Date();
@@ -12,8 +13,16 @@ const getDateFilter = (period: string) => {
   return now;
 };
 
+type ProductSalesProps = {
+  name: string;
+  category: string;
+  sellingProduct: number;
+};
+
 export class DashboardService {
-  static async getProductSales(request: { period: string }) {
+  static async getProductSales(request: {
+    period: string;
+  }): Promise<ApiResponse<any>> {
     const { period } = request;
     const dateFilter = getDateFilter(period);
 
@@ -78,16 +87,27 @@ export class DashboardService {
       (item) => item.category === "NonCoffee"
     );
 
-    return [
-      {
-        signature,
-        coffee,
-        noncoffee,
-      },
-    ];
+    return {
+      success: true,
+      data: [
+        {
+          signature,
+          coffee,
+          noncoffee,
+        },
+      ],
+    };
   }
 
-  static async totalDashboardSummary() {
+  static async totalDashboardSummary(): Promise<
+    ApiResponse<{
+      totalCustomer: number;
+      totalRevenue: number;
+      totalOrder: number;
+      totalOrderOffline: number;
+      totalOrderOnline: number;
+    }>
+  > {
     const [totalCustomer, totalRevenue, totalOrder, totalOffline, totalOnline] =
       await Promise.all([
         prismaClient.user.aggregate({
@@ -130,15 +150,21 @@ export class DashboardService {
       ]);
 
     return {
-      totalCustomer: totalCustomer._count.role_id,
-      totalRevenue: totalRevenue._sum.amount,
-      totalOrder: totalOrder._count.order_id,
-      totalOrderOffline: totalOffline._count.id,
-      totalOrderOnline: totalOnline._count.id,
+      success: true,
+      data: {
+        totalCustomer: totalCustomer._count.role_id,
+        totalRevenue: totalRevenue._sum.amount ?? 0,
+        totalOrder: totalOrder._count.order_id,
+        totalOrderOffline: totalOffline._count.id,
+        totalOrderOnline: totalOnline._count.id,
+      },
     };
   }
 
-  static async orderSummary(startDate?: Date, endDate?: Date) {
+  static async orderSummary(
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<ApiResponse<any>> {
     const grouped = await prismaClient.orderDetail.groupBy({
       by: ["product_id"],
       _sum: {
@@ -176,16 +202,19 @@ export class DashboardService {
       },
     });
 
-    return grouped.map((item) => {
-      const product = products.find((p) => p.id === item.product_id);
-      return {
-        product_id: item.product_id,
-        product_name: product?.product_name,
-        product_image: product?.image,
-        total_qty: item._sum.qty,
-        total_sales: item._sum.total_price,
-        total_orders: item._count.order_id,
-      };
-    });
+    return {
+      success: true,
+      data: grouped.map((item) => {
+        const product = products.find((p) => p.id === item.product_id);
+        return {
+          product_id: item.product_id,
+          product_name: product?.product_name ?? "",
+          product_image: product?.image ?? "",
+          total_qty: item._sum.qty ?? 0,
+          total_sales: item._sum.total_price ?? 0,
+          total_orders: item._count.order_id ?? 0,
+        };
+      }),
+    };
   }
 }
