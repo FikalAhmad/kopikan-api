@@ -2,7 +2,6 @@ import {
   Order,
   OrderDetail,
   OrderDetailOption,
-  OrderDiscount,
   OrderSource,
   OrderStatus,
 } from "@prisma/client";
@@ -12,8 +11,6 @@ export type OrderResponse = Order & {
   order_details: (OrderDetail & {
     options?: OrderDetailOption[];
   })[];
-} & {
-  discounts: OrderDiscount[];
 };
 
 export type CreateOrderRequest = {
@@ -33,7 +30,6 @@ export type CreateOrderRequest = {
       };
     }[];
   }[];
-  discounts: string[];
 };
 
 export type UpdateOrderRequest = {

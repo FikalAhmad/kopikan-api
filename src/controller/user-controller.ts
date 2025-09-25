@@ -91,6 +91,7 @@ export class UserController {
           maxAge: 24 * 60 * 60 * 1000,
           sameSite: "none",
           secure: true,
+          path: "/",
         })
         .json({
           accessToken,
@@ -111,14 +112,14 @@ export class UserController {
 
   static async Logout(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("ini token:" + req.cookies.refreshToken);
-
       const refresh_token = req.cookies.refreshToken;
       const response = await UserService.logout(refresh_token);
 
       res.clearCookie("refreshToken", {
         httpOnly: true,
+        sameSite: "none",
         secure: true,
+        path: "/",
       });
       return res.status(200).json(response);
     } catch (error) {

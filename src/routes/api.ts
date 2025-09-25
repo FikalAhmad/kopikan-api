@@ -98,8 +98,8 @@ apiRouter.get("/api/online", OrderController.getOnlineOrders);
 apiRouter.get("/api/discounts", DiscountController.getDiscount);
 apiRouter.get("/api/discounts/:id", DiscountController.getDiscountbyId);
 apiRouter.post("/api/discounts", DiscountController.createDiscount);
-apiRouter.patch("/api/discounts", DiscountController.updateDiscount);
-apiRouter.delete("/api/discounts", DiscountController.deleteDiscount);
+apiRouter.patch("/api/discounts/:id", DiscountController.updateDiscount);
+apiRouter.delete("/api/discounts/:id", DiscountController.deleteDiscount);
 
 // Payment API
 apiRouter.get("/api/payments", PaymentController.getPayments);

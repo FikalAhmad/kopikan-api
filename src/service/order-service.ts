@@ -15,13 +15,8 @@ export class OrderService {
   ): Promise<ApiResponse<OrderResponse>> {
     // const createOrderRequest = validate(OrderValidaton.CREATE, request);
 
-    const {
-      customer_id,
-      order_source,
-      delivery_address,
-      order_items,
-      discounts,
-    } = request;
+    const { customer_id, order_source, delivery_address, order_items } =
+      request;
 
     const result = await prismaClient.$transaction(async (tx) => {
       let subtotal = 0;
@@ -73,54 +68,18 @@ export class OrderService {
         });
       }
 
-      // Hitung total dengan diskon
-      let total = subtotal;
-      if (discounts?.length) {
-        const activeDiscounts = await tx.discount.findMany({
-          where: {
-            id: { in: discounts },
-            is_active: true,
-            start_date: { lte: new Date() },
-            end_date: { gte: new Date() },
-          },
-        });
-
-        for (const d of activeDiscounts) {
-          if (d.min_purchase && subtotal < d.min_purchase) continue;
-
-          let discountValue = 0;
-
-          if (d.type === "PERCENTAGE") {
-            discountValue = Math.floor((subtotal * d.value) / 100);
-            if (d.max_discount && discountValue > d.max_discount) {
-              discountValue = d.max_discount;
-            }
-          } else if (d.type === "FIXED_AMOUNT") {
-            discountValue = d.value;
-          }
-
-          total -= discountValue;
-        }
-      }
-
       const order = await tx.order.create({
         data: {
           customer_id,
           order_source,
           delivery_address,
-          total,
+          total: subtotal,
           order_details: {
             create: orderDetailsData,
-          },
-          discounts: {
-            create: discounts?.map((d: string) => ({
-              discount_id: d,
-            })),
           },
         },
         include: {
           order_details: { include: { options: true } },
-          discounts: true,
         },
       });
 
@@ -142,7 +101,6 @@ export class OrderService {
             options: true,
           },
         },
-        discounts: true,
       },
     });
     return { success: true, data: order };
@@ -157,7 +115,6 @@ export class OrderService {
             options: true,
           },
         },
-        discounts: true,
       },
     });
     if (!orderById) {
@@ -177,7 +134,6 @@ export class OrderService {
             options: true,
           },
         },
-        discounts: true,
       },
     });
     return { success: true, data: offlineOrder };
@@ -194,7 +150,6 @@ export class OrderService {
             options: true,
           },
         },
-        discounts: true,
       },
     });
     return { success: true, data: onlineOrder };

@@ -88,7 +88,6 @@ model Order {
   customer      User         @relation(fields: [customer_id], references: [id])
   order_details OrderDetail[]
   payment       Payment?
-  discounts     OrderDiscount[]
 }
 
 enum OrderSource {
@@ -135,6 +134,7 @@ model Payment {
   createdAt      DateTime @default(now())
 
   order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  discounts     PaymentDiscount[]
 }
 
 enum PaymentStatus {
@@ -168,7 +168,7 @@ model Discount {
   is_active    Boolean  @default(true)
   createdAt    DateTime @default(now())
 
-  orders OrderDiscount[]
+  payments PaymentDiscount[]
 }
 
 enum DiscountType {
@@ -177,13 +177,13 @@ enum DiscountType {
 }
 
 
-model OrderDiscount {
+model PaymentDiscount {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  order_id    String   @db.ObjectId
+  payment_id    String   @db.ObjectId
   discount_id String   @db.ObjectId
   createdAt   DateTime @default(now())
 
-  order    Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  payment    Payment    @relation(fields: [payment_id], references: [id], onDelete: Cascade)
   discount Discount @relation(fields: [discount_id], references: [id])
 }
 

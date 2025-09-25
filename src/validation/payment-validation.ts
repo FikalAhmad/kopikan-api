@@ -13,6 +13,7 @@ export class PaymentValidaton {
       "CREDIT_CARD",
       "BANK_TRANSFER",
     ] as const),
+    discounts: z.array(z.string()).optional(),
   });
 
   static readonly UPDATE: ZodType = z.object({

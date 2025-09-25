@@ -15,15 +15,69 @@ export class PaymentService {
   ): Promise<ApiResponse<void>> {
     const createPaymentRequest = validate(PaymentValidaton.CREATE, request);
 
-    const { order_id, amount, payment_method } = createPaymentRequest;
+    const { order_id, amount, payment_method, discounts } =
+      createPaymentRequest;
 
-    await prismaClient.payment.create({
-      data: {
-        order_id,
-        amount,
-        payment_method,
-        status: "COMPLETED",
-      },
+    await prismaClient.$transaction(async (tx) => {
+      // Hitung total dengan diskon
+      let total = amount;
+      if (discounts?.length) {
+        const activeDiscounts = await tx.discount.findMany({
+          where: {
+            id: { in: discounts },
+            is_active: true,
+            start_date: { lte: new Date() },
+            end_date: { gte: new Date() },
+          },
+        });
+
+        for (const d of activeDiscounts) {
+          if (d.min_purchase && total < d.min_purchase) continue;
+
+          let discountValue = 0;
+
+          if (d.type === "PERCENTAGE") {
+            discountValue = Math.floor((total * d.value) / 100);
+            if (d.max_discount && discountValue > d.max_discount) {
+              discountValue = d.max_discount;
+            }
+          } else if (d.type === "FIXED_AMOUNT") {
+            discountValue = d.value;
+          }
+
+          total -= discountValue;
+        }
+      }
+
+      const taxRate = 0.1;
+      total += total * taxRate;
+      if (total < 0) {
+        total = 0;
+      }
+
+      await tx.payment.create({
+        data: {
+          order_id,
+          amount: total,
+          payment_method,
+          status: "COMPLETED",
+          discounts: {
+            create: discounts?.map((d: string) => ({
+              discount_id: d,
+            })),
+          },
+        },
+        include: {
+          discounts: true,
+        },
+      });
+
+      await tx.order.update({
+        where: { id: order_id },
+        data: {
+          status: "COMPLETED",
+        },
+      });
     });
 
     return {
@@ -36,6 +90,7 @@ export class PaymentService {
     const payment = await prismaClient.payment.findMany({
       include: {
         order: true,
+        discounts: true,
       },
     });
     return { success: true, data: payment };
@@ -47,6 +102,7 @@ export class PaymentService {
 
       include: {
         order: true,
+        discounts: true,
       },
     });
     if (!paymentById) {
