@@ -179,6 +179,6 @@ export class MidtransService {
       }
     );
 
-    return result;
+    return await result.json();
   }
 }
