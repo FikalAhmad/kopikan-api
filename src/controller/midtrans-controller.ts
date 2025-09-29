@@ -46,4 +46,18 @@ export class MidtransController {
       next(error);
     }
   }
+
+  static async checkStatusOrder(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { order_id } = req.params;
+      const response = await MidtransService.checkStatus(order_id);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

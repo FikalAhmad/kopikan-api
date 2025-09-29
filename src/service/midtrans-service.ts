@@ -164,4 +164,21 @@ export class MidtransService {
 
     return { message: "OK" };
   }
+
+  static async checkStatus(order_id: string) {
+    const result = await fetch(
+      `https://api.sandbox.midtrans.com/v2/${order_id}/status`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Basic " +
+            Buffer.from(process.env.SERVER_KEY + ":").toString("base64"),
+        },
+      }
+    );
+
+    return result;
+  }
 }

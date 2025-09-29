@@ -121,11 +121,17 @@ apiRouter.post(
   DashboardController.getProductSalesPeriod
 );
 
-// Dashboard Management
+// Midtrans
 apiRouter.post(
   "/api/payments/ewallet",
   MidtransController.createEwalletPayment
 );
+apiRouter.get(
+  "/api/payments/status/:order_id",
+  MidtransController.checkStatusOrder
+);
+
+// Dashboard Management
 apiRouter.get(
   "/api/dashboard/total-summary",
   DashboardController.getTotalDashboardSummary
