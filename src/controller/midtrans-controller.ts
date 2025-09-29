@@ -53,8 +53,8 @@ export class MidtransController {
     next: NextFunction
   ) {
     try {
-      const { order_id } = req.params;
-      const response = await MidtransService.checkStatus(order_id);
+      const { orderId } = req.params;
+      const response = await MidtransService.checkStatus(orderId);
       res.status(200).json(response);
     } catch (error) {
       next(error);

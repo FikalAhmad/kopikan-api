@@ -165,9 +165,9 @@ export class MidtransService {
     return { message: "OK" };
   }
 
-  static async checkStatus(order_id: string) {
+  static async checkStatus(orderId: string) {
     const result = await fetch(
-      `https://api.sandbox.midtrans.com/v2/${order_id}/status`,
+      `https://api.sandbox.midtrans.com/v2/${orderId}/status`,
       {
         method: "GET",
         headers: {

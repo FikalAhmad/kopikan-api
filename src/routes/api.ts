@@ -127,7 +127,7 @@ apiRouter.post(
   MidtransController.createEwalletPayment
 );
 apiRouter.get(
-  "/api/payments/status/:order_id",
+  "/api/payments/status/:orderId",
   MidtransController.checkStatusOrder
 );
 
