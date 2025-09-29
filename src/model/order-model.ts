@@ -4,12 +4,34 @@ import {
   OrderDetailOption,
   OrderSource,
   OrderStatus,
+  Product,
 } from "@prisma/client";
 
 // Order
 export type OrderResponse = Order & {
   order_details: (OrderDetail & {
     options?: OrderDetailOption[];
+  })[];
+};
+
+export type OrderTypeResponse = Order & {
+  order_details: (OrderDetail & {
+    product: Product;
+    options: {
+      optionValue: {
+        id: string;
+        createdAt: Date;
+        option_id: string;
+        label: string;
+        extra_price: number;
+        option: {
+          id: string;
+          createdAt: Date;
+          product_id: string;
+          name: string;
+        };
+      };
+    }[];
   })[];
 };
 

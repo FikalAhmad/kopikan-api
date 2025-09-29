@@ -3,6 +3,7 @@ import { ResponseError } from "../error/response-error";
 import {
   CreateOrderRequest,
   OrderResponse,
+  OrderTypeResponse,
   UpdateOrderRequest,
 } from "../model/order-model";
 import { ApiResponse } from "../types/globals.types";
@@ -98,6 +99,7 @@ export class OrderService {
       include: {
         order_details: {
           include: {
+            product: true,
             options: true,
           },
         },
@@ -112,6 +114,7 @@ export class OrderService {
       include: {
         order_details: {
           include: {
+            product: true,
             options: true,
           },
         },
@@ -123,7 +126,7 @@ export class OrderService {
     return { success: true, data: orderById };
   }
 
-  static async getOffline(): Promise<ApiResponse<OrderResponse[]>> {
+  static async getOffline(): Promise<ApiResponse<OrderTypeResponse[]>> {
     const offlineOrder = await prismaClient.order.findMany({
       where: {
         order_source: "OFFLINE",
@@ -131,7 +134,10 @@ export class OrderService {
       include: {
         order_details: {
           include: {
-            options: true,
+            product: true,
+            options: {
+              include: { optionValue: { include: { option: true } } },
+            },
           },
         },
       },
@@ -139,7 +145,7 @@ export class OrderService {
     return { success: true, data: offlineOrder };
   }
 
-  static async getOnline(): Promise<ApiResponse<OrderResponse[]>> {
+  static async getOnline(): Promise<ApiResponse<OrderTypeResponse[]>> {
     const onlineOrder = await prismaClient.order.findMany({
       where: {
         order_source: "ONLINE",
@@ -147,7 +153,10 @@ export class OrderService {
       include: {
         order_details: {
           include: {
-            options: true,
+            product: true,
+            options: {
+              include: { optionValue: { include: { option: true } } },
+            },
           },
         },
       },

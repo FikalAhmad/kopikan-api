@@ -40,51 +40,91 @@ export class MidtransService {
   // }
 
   static async createEwalletTransaction(req: CreateEwalletPaymentRequest) {
-    const { order_id, amount, customer_name, customer_email, payment_method } =
-      req;
+    const {
+      order_id,
+      amount,
+      customer_name,
+      customer_email,
+      payment_method,
+      discounts,
+    } = req;
 
-    const ewallet = ["gopay", "shopeepay", "ovo", "dana, linkaja"];
+    const ewallet = ["gopay", "shopeepay", "ovo", "dana", "linkaja"];
+    const normalizedMethod = payment_method.toLowerCase();
+
+    let total = amount;
+    if (discounts?.length) {
+      const activeDiscounts = await prismaClient.discount.findMany({
+        where: {
+          id: { in: discounts },
+          is_active: true,
+          start_date: { lte: new Date() },
+          end_date: { gte: new Date() },
+        },
+      });
+
+      for (const d of activeDiscounts) {
+        if (d.min_purchase && total < d.min_purchase) continue;
+
+        let discountValue = 0;
+
+        if (d.type === "PERCENTAGE") {
+          discountValue = Math.floor((total * d.value) / 100);
+          if (d.max_discount && discountValue > d.max_discount) {
+            discountValue = d.max_discount;
+          }
+        } else if (d.type === "FIXED_AMOUNT") {
+          discountValue = d.value;
+        }
+
+        total -= discountValue;
+      }
+    }
 
     const payload = {
-      payment_type: payment_method.toLowerCase(),
+      payment_type: normalizedMethod,
       transaction_details: {
         order_id,
-        gross_amount: amount,
+        gross_amount: total,
       },
       customer_details: {
         first_name: customer_name,
         email: customer_email,
       },
-      // gopay: {
-      //   enable_callback: true,
-      //   callback_url: "https://yourdomain.com/payment/callback",
-      // },
     };
 
-    const midtransRes = await fetch(MIDTRANS_API_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization:
-          "Basic " +
-          Buffer.from(process.env.SERVER_KEY + ":").toString("base64"),
-      },
-    });
+    try {
+      const midtransRes = await fetch(MIDTRANS_API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Basic " +
+            Buffer.from(process.env.SERVER_KEY + ":").toString("base64"),
+        },
+      });
 
-    const result = await midtransRes.json();
+      const result = await midtransRes.json();
 
-    await prismaClient.payment.create({
-      data: {
-        order_id: order_id,
-        amount,
-        payment_method: ewallet.includes(payment_method)
-          ? "E_WALLET"
-          : (payment_method as PaymentMethod),
-      },
-    });
+      await prismaClient.payment.create({
+        data: {
+          order_id,
+          amount: total,
+          payment_method: ewallet.includes(normalizedMethod)
+            ? "E_WALLET"
+            : (payment_method.toUpperCase() as PaymentMethod),
+        },
+      });
 
-    return result;
+      return result;
+    } catch (err: any) {
+      console.error("Create Ewallet Transaction Error:", err);
+      return {
+        status_code: "500",
+        status_message: err.message || "Payment creation failed",
+      };
+    }
   }
 
   static async verifySignature(req: any) {
@@ -116,7 +156,6 @@ export class MidtransService {
     ) {
       status = "CANCELED";
     }
-    console.log("ini status testing: " + transactionStatus);
 
     await prismaClient.payment.update({
       where: { order_id },

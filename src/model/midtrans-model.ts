@@ -13,6 +13,7 @@ export type CreateEwalletPaymentRequest = {
   customer_name: string;
   customer_email: string;
   payment_method: string | PaymentMethod;
+  discounts?: string[];
 };
 
 export type MidtransWebhookRequest = {

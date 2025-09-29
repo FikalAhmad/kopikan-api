@@ -120,6 +120,7 @@ export class DashboardService {
         }),
 
         prismaClient.payment.aggregate({
+          where: { status: "COMPLETED" },
           _sum: { amount: true },
         }),
 

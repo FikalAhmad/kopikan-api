@@ -9,7 +9,7 @@ export const publicRouter = express.Router();
 publicRouter.get("/api/token", refreshToken);
 publicRouter.post("/api/register", UserController.Register);
 publicRouter.post("/api/login", UserController.Login);
-publicRouter.patch("/api/logout", UserController.Logout);
+publicRouter.patch("/api/logout/:id", UserController.Logout);
 
 // Midtrans API
 // publicRouter.post("/api/midpayment", MidtransController.createMidtransPayment);

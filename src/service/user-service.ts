@@ -185,9 +185,9 @@ export class UserService {
     };
   }
 
-  static async logout(refreshToken: string): Promise<ApiResponse<void>> {
+  static async logout(id: string): Promise<ApiResponse<void>> {
     const result = await prismaClient.user.update({
-      where: { refresh_token: refreshToken },
+      where: { id },
       data: { refresh_token: null },
     });
 

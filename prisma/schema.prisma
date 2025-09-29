@@ -14,7 +14,7 @@ model User {
   email         String   @unique
   phone         String   @unique
   role_id       String   @db.ObjectId
-  refresh_token String?  @unique
+  refresh_token String?  
   createdAt     DateTime @default(now())
 
   role   Role    @relation(fields: [role_id], references: [id])

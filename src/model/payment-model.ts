@@ -22,7 +22,7 @@ export type CreatePaymentRequest = {
   order_id: string;
   amount: number;
   payment_method: PaymentMethod;
-  discounts: string[];
+  discounts?: string[];
 };
 
 export type UpdatePaymentRequest = {
