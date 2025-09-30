@@ -107,15 +107,17 @@ export class MidtransService {
 
       const result = await midtransRes.json();
 
-      await prismaClient.payment.create({
-        data: {
-          order_id,
-          amount: total,
-          payment_method: ewallet.includes(normalizedMethod)
-            ? "E_WALLET"
-            : (payment_method.toUpperCase() as PaymentMethod),
-        },
-      });
+      if (result.status_code == "201") {
+        await prismaClient.payment.create({
+          data: {
+            order_id,
+            amount: total,
+            payment_method: ewallet.includes(normalizedMethod)
+              ? "E_WALLET"
+              : (payment_method.toUpperCase() as PaymentMethod),
+          },
+        });
+      }
 
       return result;
     } catch (err: any) {
