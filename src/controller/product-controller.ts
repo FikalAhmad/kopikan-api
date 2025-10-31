@@ -7,8 +7,12 @@ import { ProductService } from "../service/product-service";
 
 export class ProductController {
   static async getProducts(req: Request, res: Response, next: NextFunction) {
+    const { page, pageSize } = req.query;
     try {
-      const response = await ProductService.get();
+      const response = await ProductService.get(
+        page?.toString(),
+        pageSize?.toString()
+      );
       res.status(200).json(response);
     } catch (error) {
       next(error);

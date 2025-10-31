@@ -4,8 +4,12 @@ import { CreateOrderRequest, UpdateOrderRequest } from "../model/order-model";
 
 export class OrderController {
   static async getOrders(req: Request, res: Response, next: NextFunction) {
+    const { page, pageSize } = req.query;
     try {
-      const response = await OrderService.get();
+      const response = await OrderService.get(
+        page?.toString(),
+        pageSize?.toString()
+      );
       res.status(200).json(response);
     } catch (error) {
       next(error);

@@ -1,5 +1,6 @@
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
+import { applyPagination } from "../lib/pagination";
 import {
   CreateProductRequest,
   ProductOptionValue,
@@ -46,7 +47,15 @@ export class ProductService {
     };
   }
 
-  static async get(): Promise<ApiResponse<ProductWithOptionResponse[]>> {
+  static async get(
+    page?: string,
+    pageSize?: string
+  ): Promise<ApiResponse<ProductWithOptionResponse[]>> {
+    const { skip, take } = applyPagination({
+      page: Number(page),
+      pageSize: Number(pageSize),
+      limit: 50,
+    });
     const product = await prismaClient.product.findMany({
       include: {
         options: {
@@ -55,10 +64,22 @@ export class ProductService {
           },
         },
       },
+      skip,
+      take,
+      orderBy: { id: "asc" },
     });
+
+    const total = await prismaClient.product.count();
+
     return {
       success: true,
       data: product,
+      pagination: {
+        total,
+        page: Number(page) || 1,
+        pageSize: take,
+        totalPages: Math.ceil(total / take),
+      },
     };
   }
 

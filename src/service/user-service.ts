@@ -11,6 +11,7 @@ import { validate } from "../validation/validation";
 import { UserValidaton } from "../validation/user-validation";
 import { ResponseError } from "../error/response-error";
 import { ApiResponse } from "../types/globals.types";
+import { applyPagination } from "../lib/pagination";
 
 export class UserService {
   static async register(
@@ -95,7 +96,16 @@ export class UserService {
     };
   }
 
-  static async get(): Promise<ApiResponse<UserResponse[]>> {
+  static async get(
+    page?: string,
+    pageSize?: string
+  ): Promise<ApiResponse<UserResponse[]>> {
+    const { skip, take } = applyPagination({
+      page: Number(page),
+      pageSize: Number(pageSize),
+      limit: 50,
+    });
+
     const user = await prismaClient.user.findMany({
       select: {
         id: true,
@@ -110,10 +120,22 @@ export class UserService {
           },
         },
       },
+      skip,
+      take,
+      orderBy: { id: "asc" },
     });
+
+    const total = await prismaClient.user.count();
+
     return {
       success: true,
       data: user,
+      pagination: {
+        total,
+        page: Number(page) || 1,
+        pageSize: take,
+        totalPages: Math.ceil(total / take),
+      },
     };
   }
 

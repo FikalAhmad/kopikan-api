@@ -1,5 +1,6 @@
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
+import { applyPagination } from "../lib/pagination";
 import {
   CreateOrderRequest,
   OrderResponse,
@@ -94,7 +95,15 @@ export class OrderService {
     };
   }
 
-  static async get(): Promise<ApiResponse<OrderResponse[]>> {
+  static async get(
+    page?: string,
+    pageSize?: string
+  ): Promise<ApiResponse<OrderResponse[]>> {
+    const { skip, take } = applyPagination({
+      page: Number(page),
+      pageSize: Number(pageSize),
+      limit: 50,
+    });
     const order = await prismaClient.order.findMany({
       include: {
         order_details: {
@@ -104,8 +113,22 @@ export class OrderService {
           },
         },
       },
+      skip,
+      take,
+      orderBy: { id: "asc" },
     });
-    return { success: true, data: order };
+
+    const total = await prismaClient.order.count();
+    return {
+      success: true,
+      data: order,
+      pagination: {
+        total,
+        page: Number(page) || 1,
+        pageSize: take,
+        totalPages: Math.ceil(total / take),
+      },
+    };
   }
 
   static async getById(id: string): Promise<ApiResponse<OrderResponse>> {

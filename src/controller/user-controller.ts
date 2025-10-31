@@ -8,8 +8,12 @@ import {
 
 export class UserController {
   static async getUsers(req: Request, res: Response, next: NextFunction) {
+    const { page, pageSize } = req.query;
     try {
-      const response = await UserService.get();
+      const response = await UserService.get(
+        page?.toString(),
+        pageSize?.toString()
+      );
       res.status(200).json(response);
     } catch (error) {
       next(error);
@@ -115,12 +119,13 @@ export class UserController {
       const id = req.params.id;
       const response = await UserService.logout(id);
 
-      // res.clearCookie("refreshToken", {
-      //   httpOnly: true,
-      //   sameSite: "none",
-      //   secure: true,
-      //   path: "/",
-      // });
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        path: "/",
+      });
+
       return res.status(200).json(response);
     } catch (error) {
       next(error);
