@@ -11,9 +11,18 @@ dotenv.config();
 export const web = express();
 web.use(express.json());
 web.use(cookieParser());
+
+const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
 web.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true); // allow
+      } else {
+        callback(new Error("Not allowed by CORS")); // block
+      }
+    },
+    credentials: true,
   })
 );
 web.use(helmet());
