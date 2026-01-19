@@ -6,13 +6,18 @@ import { publicRouter } from "../routes/public-api";
 import { apiRouter } from "../routes/api";
 import midtransClient from "midtrans-client";
 import helmet from "helmet";
+import { expressRateLimit } from "../middleware/rate-limit";
 
 dotenv.config();
 export const web = express();
 web.use(express.json());
 web.use(cookieParser());
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://pos-kopikan.vercel.app",
+];
 web.use(
   cors({
     origin: (origin, callback) => {
@@ -23,9 +28,10 @@ web.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 web.use(helmet());
+web.use(expressRateLimit());
 
 export const snap = new midtransClient.Snap({
   isProduction: false, // true jika sudah live
