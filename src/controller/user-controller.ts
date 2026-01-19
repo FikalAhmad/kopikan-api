@@ -87,7 +87,7 @@ export class UserController {
     try {
       const request: LoginUserRequest = req.body as LoginUserRequest;
       const response = await UserService.login(request);
-      const { accessToken, refreshToken, msg } = response;
+      const { data, accessToken, refreshToken, msg } = response;
       res
         .status(200)
         .cookie("refreshToken", refreshToken, {
@@ -98,6 +98,7 @@ export class UserController {
           path: "/",
         })
         .json({
+          data,
           accessToken,
           refreshToken,
           msg,

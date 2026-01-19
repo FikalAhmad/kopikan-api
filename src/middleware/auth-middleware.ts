@@ -38,7 +38,10 @@ export const authMiddleware = async (
       const payload = decoded as JwtPayload;
 
       req.user = req.user || ({} as User);
-      req.user.email = payload.email;
+      req.user.id = payload.id as string;
+      req.user.name = payload.name as string;
+      req.user.email = payload.email as string;
+      req.user.role_id = payload.role_id as string;
       next();
     });
   } catch (error) {
