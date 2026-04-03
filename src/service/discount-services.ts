@@ -1,4 +1,5 @@
 import { prismaClient } from "../application/database";
+import { applyPagination } from "../lib/pagination";
 import {
   CreateDiscountRequest,
   DiscountResponse,
@@ -9,9 +10,23 @@ import { DiscountValidaton } from "../validation/discount-validation";
 import { validate } from "../validation/validation";
 
 export class DiscountService {
-  static async get(): Promise<ApiResponse<DiscountResponse[]>> {
-    const allDiscount = await prismaClient.discount.findMany();
-    return { success: true, data: allDiscount };
+  static async get(page?: string,
+    pageSize?: string): Promise<ApiResponse<DiscountResponse[]>> {
+      const { skip, take } = applyPagination({
+            page: Number(page),
+            pageSize: Number(pageSize),
+            limit: 50,
+          });
+    const allDiscount = await prismaClient.discount.findMany(
+      {
+        skip,
+        take,
+        orderBy: { id: "asc" },
+      }
+    );
+    const total = await prismaClient.discount.count();
+
+    return { success: true, data: allDiscount, pagination: { total, page: Number(page) || 1, pageSize: take, totalPages: Math.ceil(total / take) } };
   }
 
   static async getById(

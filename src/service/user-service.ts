@@ -43,12 +43,15 @@ export class UserService {
 
   static async login(
     request: LoginUserRequest
-  ): Promise<{ data: Pick<UserResponse, "name" | "email" | "role_id">; refreshToken: string; accessToken: string; msg: string }> {
+  ): Promise<{ data: { id: string; name: string; email: string; role_id: string; role_name: string }; refreshToken: string; accessToken: string; msg: string }> {
     const loginRequest = validate(UserValidaton.LOGIN, request);
 
     let user = await prismaClient.user.findUnique({
       where: {
         email: loginRequest.email,
+      },
+      include: {
+        role: true,
       },
     });
 
@@ -68,8 +71,9 @@ export class UserService {
     const name = user.name;
     const email = user.email;
     const role_id = user.role_id;
+    const role_name = user.role.role_name;
     const accessToken = jwt.sign(
-      { id, name, email, role_id },
+      { id, name, email, role_id, role_name },
       process.env.ACCESS_TOKEN_SECRET ?? "",
       {
         expiresIn: "1d",
@@ -92,9 +96,11 @@ export class UserService {
     });
     return {
       data: {
+        id,
         name,
         email,
-        role_id
+        role_id,
+        role_name,
       },
       refreshToken: refreshToken,
       accessToken: accessToken,
