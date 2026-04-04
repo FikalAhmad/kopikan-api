@@ -12,7 +12,7 @@ import { applyPagination } from "../lib/pagination";
 
 export class PaymentService {
   static async create(
-    request: CreatePaymentRequest
+    request: CreatePaymentRequest,
   ): Promise<ApiResponse<void>> {
     const createPaymentRequest = validate(PaymentValidaton.CREATE, request);
 
@@ -87,13 +87,15 @@ export class PaymentService {
     };
   }
 
-  static async get(page?: string,
-    pageSize?: string): Promise<ApiResponse<PaymentResponse[]>> {
-      const { skip, take } = applyPagination({
-            page: Number(page),
-            pageSize: Number(pageSize),
-            limit: 50,
-          });
+  static async get(
+    page?: string,
+    pageSize?: string,
+  ): Promise<ApiResponse<PaymentResponse[]>> {
+    const { skip, take } = applyPagination({
+      page: Number(page),
+      pageSize: Number(pageSize),
+      limit: 50,
+    });
     const payment = await prismaClient.payment.findMany({
       include: {
         order: true,
@@ -106,7 +108,16 @@ export class PaymentService {
 
     const total = await prismaClient.payment.count();
 
-    return { success: true, data: payment, pagination: { total, page: Number(page) || 1, pageSize: take, totalPages: Math.ceil(total / take) } };
+    return {
+      success: true,
+      data: payment,
+      pagination: {
+        total,
+        page: Number(page) || 1,
+        pageSize: take,
+        totalPages: Math.ceil(total / take),
+      },
+    };
   }
 
   static async getById(id: string): Promise<ApiResponse<PaymentResponse>> {
@@ -126,7 +137,7 @@ export class PaymentService {
 
   static async update(
     id: string,
-    request: UpdatePaymentRequest
+    request: UpdatePaymentRequest,
   ): Promise<ApiResponse<void>> {
     const updatePaymentRequest = validate(PaymentValidaton.UPDATE, request);
 

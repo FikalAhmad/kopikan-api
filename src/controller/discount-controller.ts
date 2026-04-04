@@ -8,7 +8,11 @@ import { DiscountService } from "../service/discount-services";
 export class DiscountController {
   static async getDiscount(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await DiscountService.get();
+      const { page, pageSize } = req.query;
+      const response = await DiscountService.get(
+        page?.toString(),
+        pageSize?.toString(),
+      );
       res.status(200).json(response);
     } catch (error) {
       next(error);
@@ -18,7 +22,7 @@ export class DiscountController {
   static async getDiscountbyId(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const response = await DiscountService.getById(req.params.id);

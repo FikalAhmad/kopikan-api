@@ -8,7 +8,11 @@ import {
 export class PaymentController {
   static async getPayments(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await PaymentService.get();
+      const { page, pageSize } = req.query;
+      const response = await PaymentService.get(
+        page?.toString(),
+        pageSize?.toString(),
+      );
       res.status(200).json(response);
     } catch (error) {
       next(error);
